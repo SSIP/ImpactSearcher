@@ -1,0 +1,9 @@
+*.suo
+*.user
+[Dd]ebug/
+[Rr]elease/
+tmp/
+[Bb]in/
+[Oo]bj/
+.vs/
+.no-upload/
