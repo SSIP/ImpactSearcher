@@ -14,7 +14,7 @@ circle fitCircle(coordinates *borderPoints);
 bool sliceImage(coordinates start, direction vector, image imageData, uint8_t **data, uint32_t length);
 
 // fit a simple jupiter model to image and return rotation angle
-bool fitJupiterModel(image imageData, direction *angle, uint32_t *radius, );
+bool fitJupiterModel(image imageData, direction *angle, uint32_t *radius);
 
 // walk a slice from the center in both directions until threshold is reached
 // threshold equals 2sigma of noise or something
