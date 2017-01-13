@@ -1,4 +1,5 @@
 #include "math_helpers.h"
+#include "definitions.h"
 
 coordinates rayCenter(coordinates approximateCenter, image* frame, int32_t numberRays, config* cfg){
 	int32_t i;
