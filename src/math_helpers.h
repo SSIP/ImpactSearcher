@@ -17,6 +17,7 @@ circle fitCircle(coordinates *borderPoints);
 bool sliceImage(coordinates start, direction vector, image imageData, uint8_t **data, uint32_t length);
 
 // fit a simple jupiter model to image and save rotation angle and radius
+// angle = 0 means north pole is facing up
 bool fitJupiterModel(image *imageData);
 
 // walk a slice from the center in both directions until threshold is reached
@@ -27,3 +28,10 @@ coordinates *findBorder(uint32_t center, imgSlice slice);
 // the three corners with least difference by least squares are used for
 // total background
 void calcNoise(image *imgData);
+
+// parameter is subtracted image
+// calculate noise in corners of image
+// we know the area of the planet
+// find pixels with unlikely deviations from mean. take adjacent pixels
+// into account. add brightness of pixels if signal > 3sigma and return as signal
+double signalToNoise(image *subtractedData);
