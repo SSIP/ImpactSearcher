@@ -48,7 +48,3 @@ coordinates massCenter(image* frame, config* cfg){
 		fprintf(stderr, (string(frame->fileName) + ": moveX=" + to_string(move.x) + ", moveY=" + to_string(move.y) + "\n").c_str());
 	return move;
 }
-
-void calculateReferenceCoordinates(){
-
-}

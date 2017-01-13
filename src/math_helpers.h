@@ -6,6 +6,9 @@ struct circle {
 	double_t radius;
 };
 
+coordinates rayCenter(coordinates approximateCenter, image* frame, int32_t numberRays, config* cfg);
+coordinates massCenter(image* frame, config* cfg);
+
 // fit a circle to a list of coordinates with least squares
 circle fitCircle(coordinates *borderPoints);
 
@@ -13,8 +16,8 @@ circle fitCircle(coordinates *borderPoints);
 // the image. length of slice is returned as well.
 bool sliceImage(coordinates start, direction vector, image imageData, uint8_t **data, uint32_t length);
 
-// fit a simple jupiter model to image and return rotation angle
-bool fitJupiterModel(image imageData, direction *angle, uint32_t *radius);
+// fit a simple jupiter model to image and save rotation angle and radius
+bool fitJupiterModel(image *imageData);
 
 // walk a slice from the center in both directions until threshold is reached
 // threshold equals 2sigma of noise or something
