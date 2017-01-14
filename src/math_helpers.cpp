@@ -51,7 +51,7 @@ coordinates massCenter(image* frame, config* cfg){
 
 void calcNoiseCorners(image *imgData, config* cfg){
 	uint32_t maxDiameter, triHeight, triLeg, numPixels;
-	noise upperLeft, upperRight, bottomLeft, bottomRight;
+	noise topLeft, topRight, bottomLeft, bottomRight;
 	
 	if (cfg->imageResX > cfg->imageResY){
 		maxDiameter = (uint32_t)(cfg->imageResY + cfg->imageResY * 0.2);
@@ -65,46 +65,63 @@ void calcNoiseCorners(image *imgData, config* cfg){
 	uint32_t pixels[numPixels];
 	uint32_t y,counter;
 
-/*   ---------------------------------------------------------> X axis
- *  |  upper left                                  upper right
- *  |    0:0   0:1   0:2    0:3 …   0:97   0:98   0:99   0:100
- *  |    1:0   1:1   1:2        …          1:98   1:99   1:100
- *  |    2:0   2:1              …                 2:99   2:100
- *  |    3:0                    …                        3:100
- *  |     …     …     …      …  …    …      …      …      …
- *  |   97:0                    …                        7:100
- *  |   98:0  98:1              …                98:99  98:100
- *  |   99:0  99:1  99:2        …	      99:98  99:99  99:100
- *  |  100:0 100:1 100:2  100:3 … 100:97 100:98 100:99 100:100
- *  |  bottom left                                bottom right
+/*
+ * image[x][y]
+ *  0 -------------------------------------------------------> X axis
+ *  |  top left                                     top right
+ *  |    0:0   0:1   0:2   0:3 …   0:97   0:98   0:99   0:100
+ *  |    1:0   1:1   1:2       …          1:98   1:99   1:100
+ *  |    2:0   2:1             …                 2:99   2:100
+ *  |    3:0                   …                        3:100
+ *  |     …     …     …     …  …    …      …      …      …
+ *  |   97:0                   …                        7:100
+ *  |   98:0  98:1             …                98:99  98:100
+ *  |   99:0  99:1  99:2       …	     99:98  99:99  99:100
+ *  |  100:0 100:1 100:2 100:3 … 100:97 100:98 100:99 100:100
+ *  |  bottom left                               bottom right
  *  v
  * 
  *  Y axis
  */
- 
-	// upper left corner
-	// take pixels in triangle beginning in corner and move in one pixel at a time
-	for (uint32_t n = 0; n <= triLeg; n++){
-		for (uint32_t x = 0; x < triLeg; x++){
-			// sum of x and y coords equals n, split between x and y
-			y = n - x;
+
+	// top left
+	for (uint32_t x = 0; x < triLeg; x++){
+		for (uint32_t y = 0; y <= triLeg - x; y++){
 			pixels[counter] = imgData->rawBitmap[x][y];
 			counter++;
 		}
 	}
-	upperLeft = calcNoise(pixels);
+	topLeft = calcNoise(pixels);
 	
 	counter = 0;
 	// bottom left
-	for (uint32_t n = cfg->imageResY; n <= triLeg; n--){
-		for (uint32_t y = 0; y < triLeg; y++) {
-			// sum of x and y coords equals n, split between x and y
-			x = n - y;
+	for (uint32_t x = 0; x < triLeg; x++){
+		for (uint32_t y = cfg-imageResY - triLeg + x; y < cfg->imageResY ; y++){
 			pixels[counter] = imgData->rawBitmap[x][y];
 			counter++;
 		}
 	}
 	bottomLeft = calcNoise(pixels);
+	
+	counter = 0;
+	// top right
+	for (uint32_t x = cfg->imageResX - triLeg; x < cfg->imageResX; x++){
+		for (uint32_t y = 0; y < (x - cfg->imageResX + triLeg); y++){
+			pixels[counter] = imgData->rawBitmap[x][y];
+			counter++;
+		}
+	}
+	topRight = calcNoise(pixels);
+	
+	counter = 0;
+	// bottom right
+	for (uint32_t x = cfg->imageResX - triLeg; x < cfg->imageResX; x++){
+		for (uint32_t y = cfg->imageResY - (x - cfg->imageResX + trileg); y < cfg->imageResY; y++){
+			pixels[counter] = imgData->rawBitmap[x][y];
+			counter++;
+		}
+	}
+	bottomRight = calcNoise(pixels);
 }	
 
 noise calcNoise(uint32_t *pixels){
