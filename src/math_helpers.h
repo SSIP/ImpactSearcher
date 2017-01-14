@@ -27,7 +27,10 @@ coordinates *findBorder(uint32_t center, imgSlice slice);
 // calculate avg and std dev of noise from corners of image
 // the three corners with least difference by least squares are used for
 // total background
-void calcNoise(image *imgData);
+void calcNoiseCorners(image *imgData);
+
+// calc noise from array of pixel values
+noise calcNoise(uint32_t *pixels);
 
 // parameter is subtracted image
 // calculate noise in corners of image

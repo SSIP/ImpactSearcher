@@ -32,10 +32,10 @@ coordinates massCenter(image* frame, config* cfg){
 	uint32_t sumX = 0, sumY = 0, sumTotal = 0, x, y, pixel;
 	coordinates move;
 
-	for (y = 0; y < cfg->imageResY; y += cfg->centerSkipPixels) { // loop y axis
-		for (x = 0; x < cfg->imageResX; x += cfg->centerSkipPixels) { // loop x axis
+	for (y = 0; y < cfg->imageResY; y += cfg->centerSkipPixels){ // loop y axis
+		for (x = 0; x < cfg->imageResX; x += cfg->centerSkipPixels){ // loop x axis
 			pixel = frame->rawBitmap[x + y*  cfg->imageResX];
-			if (pixel >= cfg->centerThreshold) {
+			if (pixel >= cfg->centerThreshold){
 				sumX += x*  pixel;
 				sumY += y*  pixel;
 				sumTotal += pixel;
@@ -47,4 +47,28 @@ coordinates massCenter(image* frame, config* cfg){
 	if (cfg->verbosity >= 3)
 		fprintf(stderr, (string(frame->fileName) + ": moveX=" + to_string(move.x) + ", moveY=" + to_string(move.y) + "\n").c_str());
 	return move;
+}
+
+void calcNoiseCorners(image *imgData, config* cfg){
+	uint32_t maxDiameter, triHeight, triLeg, numPixels;
+	noise upperLeft, upperRight, bottomLeft, bottomRight;
+	
+	if (cfg->imageResX > cfg->imageResY){
+		maxDiameter = (uint32_t)(cfg->imageResY + cfg->imageResY * 0.2);
+	}
+	else {
+		maxDiameter = (uint32_t)(cfg->imageResX + cfg->imageResY * 0.2);
+	}
+	triHeight = sqrt(2*pow(maxDiameter,2));
+	triLeg = (uint32_t)sqrt(2)*triHeight;
+	numPixels = (uint32_t)0.5 * pow(2*triLeg,2);
+	
+	// take pixels in triangle beginning in corner and move in one pixel at a time
+	for (n = 0; y <= triLeg; n++){
+		
+	}
+}	
+
+noise calcNoise(uint32_t *pixels){
+	
 }

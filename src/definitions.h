@@ -44,12 +44,15 @@ struct impact {
 	vector<coordinates> ROI; //Region of Interest
 };
 
+struct noise {
+	double variance, stdDev, average;
+};
+
 struct image {
 	string fileName;
 	uint8_t* rawBitmap;
 	int16_t* diffBitmap;
-	uint8_t avgValue;
-	double varianceValue, stdDev;
+	noise imgNoise;
 	forward_list<impact>* impacts;
 	time_t timestamp;
 	uint32_t diffHistogram[512];
