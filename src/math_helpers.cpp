@@ -45,7 +45,7 @@ coordinates massCenter(image* frame, config* cfg){
 	move.x = -(int32_t)((sumX / sumTotal) - cfg->imageResX / 2);
 	move.y = (sumY / sumTotal) - cfg->imageResY / 2;
 	if (cfg->verbosity >= 3)
-		fprintf(stderr, (string(frame->fileName) + ": moveX=" + to_string(move.x) + ", moveY=" + to_string(move.y) + "\n").c_str());
+		fwprintf(stderr, (wstring(frame->fileName) + L": moveX=" + to_wstring(move.x) + L", moveY=" + to_wstring(move.y) + L"\n").c_str());
 	return move;
 }
 

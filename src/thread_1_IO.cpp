@@ -2,8 +2,9 @@
 #include "image_bmp.h"
 #include "filesystem.h"
 
+static config* g_cfg;
+
 void initImageParameters(const uint32_t width, const uint32_t height) {
-	extern config* g_cfg;
 	g_cfg->imageResX = width;
 	g_cfg->imageResY = height;
 	g_cfg->leadingAverage = new averageImage(width, height, g_cfg->leadingAverageLength);
@@ -11,6 +12,7 @@ void initImageParameters(const uint32_t width, const uint32_t height) {
 }
 
 void ioThread(config* cfg) {
+	g_cfg = cfg;
 	image* curImg;
 
 	for (; cfg->shutdownThread != 1; this_thread::sleep_for(chrono::milliseconds(10))) {
