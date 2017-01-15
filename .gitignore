@@ -1,12 +1,24 @@
+*.vcxproj.filters
+*.vcxproj
+*.sln
+tmp/
+
+# https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 *.suo
 *.user
+*.userosscache
+*.sln.docstates
+*.userprefs
 [Dd]ebug/
+[Dd]ebugPublic/
 [Rr]elease/
-tmp/
+[Rr]eleases/
+x64/
+x86/
+bld/
 [Bb]in/
 [Oo]bj/
-.vs/
-.no-upload/
+[Ll]og/
 
 # https://github.com/github/gitignore/blob/master/CMake.gitignore
 CMakeCache.txt
