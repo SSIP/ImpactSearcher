@@ -1,5 +1,4 @@
 #include "image_helper.h"
-#include "zlib.h"
 #include <stdio.h>
 #include <sys/stat.h>
 
@@ -18,21 +17,6 @@
 #endif
 #ifndef ARCH_OK
 #error Tested only for x86 architectures. If you are brave, remove this line.
-#endif
-
-#ifdef _UNICODE
-#error "Unicode charset handling not supported, see ioThread() for details"
-#endif
-#ifdef _MBCS
-#error "Multi-byte charset handling not supported, see ioThread() for details"
-#endif
-
-#ifdef WIN32
-#ifdef _DEBUG
-#pragma comment(lib, "lib/debug/libpng16.lib")
-#else
-#pragma comment(lib, "lib/release/libpng16.lib")
-#endif
 #endif
 
 /*

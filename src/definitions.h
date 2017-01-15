@@ -1,15 +1,15 @@
 #pragma once
-#include <string>
 #include <forward_list>
+#include <list>
 #include <vector>
 #include <queue>
-#include <string>
 #include <thread>
 #include <mutex>
 #include <chrono>
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <cstdint>
+#include <string>
 using namespace std;
 
 enum enumKeepFrames {
@@ -49,6 +49,7 @@ struct noise {
 };
 
 struct image {
+
 /*
  * image[x][y]
  *  0 -------------------------------------------------------> X axis
@@ -67,8 +68,7 @@ struct image {
  * 
  *  Y axis
  */
- 
-	string fileName;
+	wstring fileName;
 	uint8_t* rawBitmap;
 	int16_t* diffBitmap;
 	noise imgNoise;
@@ -98,7 +98,7 @@ struct averageImage {
 struct config {
 	// command line/config file arguments
 	// 01: IO thread
-	string srcPath, dstPath;			// input & output folder
+	wstring srcPath, dstPath;			// input & output folder
 	enumKeepFrames keepFrames;			// archive all, interesting or candidate frames
 	enumArchiveType archiveType;		// archive as bmp or png files (or not at all)
 	uint32_t imageResX, imageResY;		// image resolution in pixels
@@ -131,8 +131,6 @@ struct config {
 	queue<image*> qCenter, qAverage, qPresort, qCheck;
 	mutex mCenter, mAverage, mPresort, mCheck;
 	uint32_t shutdownThread;
-
-	config();
 };
 
 void ioThread(config* cfg);
