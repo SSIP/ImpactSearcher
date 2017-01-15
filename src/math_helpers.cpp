@@ -1,5 +1,4 @@
 #include "math_helpers.h"
-#include "definitions.h"
 #include <algorithm>
 
 coordinates rayCenter(coordinates approximateCenter, image* frame, int32_t numberRays, config* cfg){
@@ -94,17 +93,17 @@ void calcNoiseCorners(image *imgData, config* cfg){
 			counter++;
 		}
 	}
-	topLeft = calcNoise(pixels);
+	noise topLeft = calcNoise(pixels);
 	
 	counter = 0;
 	// bottom left
 	for (uint32_t x = 0; x < triLeg; x++){
-		for (uint32_t y = cfg-imageResY - triLeg + x; y < cfg->imageResY ; y++){
+		for (uint32_t y = cfg->imageResY - triLeg + x; y < cfg->imageResY ; y++){
 			pixels[counter] = imgData->rawBitmap[y][x];
 			counter++;
 		}
 	}
-	bottomLeft = calcNoise(pixels);
+	noise bottomLeft = calcNoise(pixels);
 	
 	counter = 0;
 	// top right
@@ -114,17 +113,17 @@ void calcNoiseCorners(image *imgData, config* cfg){
 			counter++;
 		}
 	}
-	topRight = calcNoise(pixels);
+	noise topRight = calcNoise(pixels);
 	
 	counter = 0;
 	// bottom right
 	for (uint32_t x = cfg->imageResX - triLeg; x < cfg->imageResX; x++){
-		for (uint32_t y = cfg->imageResY - (x - cfg->imageResX + trileg); y < cfg->imageResY; y++){
+		for (uint32_t y = cfg->imageResY - (x - cfg->imageResX + triLeg); y < cfg->imageResY; y++){
 			pixels[counter] = imgData->rawBitmap[y][x];
 			counter++;
 		}
 	}
-	bottomRight = calcNoise(pixels);
+	noise bottomRight = calcNoise(pixels);
 	
 	// least squares differences in avg and std dev, use the 3 closest corners
 	int myints[] = {1,2,3,4};
@@ -145,21 +144,21 @@ noise calcNoise(uint32_t *pixels){
 double getMean()
 {
 	double sum = 0.0;
-	for(double a : data)
-		sum += a;
-	return sum/size;
+	//for(double a : data)
+	//	sum += a;
+	//return sum/size;
 }
 
 double getVariance()
 {
 	double mean = getMean();
 	double temp = 0;
-	for(double a :data)
-		temp += (a-mean)*(a-mean);
-	return temp/size;
+	//for(double a :data)
+	//	temp += (a-mean)*(a-mean);
+	//return temp/size;
 }
 
 double getStdDev()
 {
-	return Math.sqrt(getVariance());
+	//return Math.sqrt(getVariance());
 }
