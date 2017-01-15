@@ -84,10 +84,10 @@ void createPng(const uint32_t width, const uint32_t height, const uint8_t bitDep
 	png_destroy_write_struct(&png_ptr, &info_ptr);
 }
 
-void _debugPng(const string fileName, const string append, const void* data, const uint8_t bitDepth) {
+void _debugPng(const wstring fileName, const wstring append, const void* data, const uint8_t bitDepth) {
 	extern config* g_cfg;
 
-	string newName(fileName);
+	wstring newName(fileName);
 	newName.erase(newName.find("."));
 	newName.append(append);
 	FILE* fOut;
@@ -102,10 +102,10 @@ void _debugPng(const string fileName, const string append, const void* data, con
 		throw runtime_error(NULL);
 }
 
-void debugPng(const string fileName, const string append, uint8_t* data) {
+void debugPng(const wstring fileName, const wstring append, uint8_t* data) {
 	_debugPng(fileName, append, data, 8);
 }
 
-void debugPng(const string fileName, const string append, uint16_t* data) {
+void debugPng(const wstring fileName, const wstring append, uint16_t* data) {
 	_debugPng(fileName, append, data, 16);
 }

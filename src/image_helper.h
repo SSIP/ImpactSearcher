@@ -1,8 +1,5 @@
 #pragma once
 #include "definitions.h"
-#include <string>
-#include <vector>
-using namespace std;
 
 void initImageParameters(const uint32_t width, const uint32_t height);
 
