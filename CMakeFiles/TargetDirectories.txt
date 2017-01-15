@@ -1,3 +1,0 @@
-/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/CMakeFiles/edit_cache.dir
-/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/CMakeFiles/rebuild_cache.dir
-/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/CMakeFiles/image_helper.cpp.dir
