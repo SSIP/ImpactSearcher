@@ -34,22 +34,33 @@ struct coordinates {
 	uint32_t x, y;
 };
 
+struct direction {
+	double_t x, y;
+};
+
 struct impact {
 	coordinates center;
 	uint32_t maxVal, radius, SNR, totalLum;
 	vector<coordinates> ROI; //Region of Interest
 };
 
+struct noise {
+	double variance, stdDev, average;
+};
+
 struct image {
 	wstring fileName;
 	uint8_t* rawBitmap;
 	int16_t* diffBitmap;
-	uint8_t avgValue;
-	double varianceValue, stdDev;
+	noise imgNoise;
 	forward_list<impact>* impacts;
 	time_t timestamp;
 	uint32_t diffHistogram[512];
 	uint32_t interestingStartValue;
+
+	// fit of circle around planet. image is centered on planet center.
+	uint32_t radiusPlanet;
+	direction anglePlanet;
 
 	image(uint32_t imageResX, uint32_t imageResY, uint8_t* inputData);
 	~image();

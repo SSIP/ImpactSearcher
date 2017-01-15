@@ -1,0 +1,112 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/definitions.h
+string
+-
+forward_list
+-
+vector
+-
+queue
+-
+string
+-
+thread
+-
+mutex
+-
+chrono
+-
+math.h
+-
+cstdint
+-
+
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/image_bmp.cpp
+image_bmp.h
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/image_bmp.h
+
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/image_bmp.h
+image_helper.h
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/image_helper.h
+
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/image_helper.h
+definitions.h
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/definitions.h
+string
+-
+vector
+-
+
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/image_png.cpp
+image_png.h
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/image_png.h
+png.h
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/png.h
+pngstruct.h
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/pngstruct.h
+
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/image_png.h
+image_helper.h
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/image_helper.h
+
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/main.cpp
+conio.h
+-
+definitions.h
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/definitions.h
+image_helper.h
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/image_helper.h
+cslib/console.h
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/cslib/console.h
+
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/math_helpers.cpp
+math_helpers.h
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/math_helpers.h
+
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/math_helpers.h
+
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/thread_1_IO.cpp
+definitions.h
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/definitions.h
+image_bmp.h
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/image_bmp.h
+cslib/FsTools.h
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/cslib/FsTools.h
+image_png.h
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/image_png.h
+image_helper.h
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/image_helper.h
+
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/thread_2_center.cpp
+definitions.h
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/definitions.h
+image_helper.h
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/image_helper.h
+image_png.h
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/image_png.h
+
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/thread_3_average.cpp
+definitions.h
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/definitions.h
+image_helper.h
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/image_helper.h
+image_png.h
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/image_png.h
+
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/thread_4_presort.cpp
+definitions.h
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/definitions.h
+image_helper.h
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/image_helper.h
+
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/thread_5_check.cpp
+definitions.h
+/home/sven/Dokumente/Astronomie/Impact Project/ImpactSearcher/src/definitions.h
+

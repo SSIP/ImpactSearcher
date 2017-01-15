@@ -1,0 +1,2 @@
+/usr/bin/ar qc libimage_helper.cpp.a  CMakeFiles/image_helper.cpp.dir/main.cpp.o CMakeFiles/image_helper.cpp.dir/thread_2_center.cpp.o CMakeFiles/image_helper.cpp.dir/math_helpers.cpp.o CMakeFiles/image_helper.cpp.dir/thread_3_average.cpp.o CMakeFiles/image_helper.cpp.dir/image_bmp.cpp.o CMakeFiles/image_helper.cpp.dir/image_png.cpp.o CMakeFiles/image_helper.cpp.dir/thread_4_presort.cpp.o CMakeFiles/image_helper.cpp.dir/thread_1_IO.cpp.o CMakeFiles/image_helper.cpp.dir/thread_5_check.cpp.o
+/usr/bin/ranlib libimage_helper.cpp.a
