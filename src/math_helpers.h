@@ -1,5 +1,7 @@
 #include "definitions.h"
 
+typedef uint8_t** imgSlice;
+
 // defines a circle with coordinates of center plus radius
 struct circle {
 	coordinates center;
