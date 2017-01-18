@@ -1,6 +1,5 @@
 #include "definitions.h"
 #include "image_helper.h"
-#include "image_png.h"
 
 //#define SIMPLE_AVERAGE
 // todo: do we need the average image outside of this thread -> no
@@ -43,7 +42,7 @@ void averageThread(config* cfg) {
 			uint32_t factor = 256 / cfg->trailingAverageLength;
 			for (uint32_t i = 0; i < cfg->trailingAverage->imageSize; i++)
 				tmp[i] = cfg->trailingAverage->sum[i]*  factor;
-			debugPng(curImg->fileName, "_sum.png", tmp);
+			//debugPng(curImg->fileName, "_sum.png", tmp);
 			delete tmp;
 
 			// average image has a dynamic range of <= 8 bit
@@ -54,14 +53,14 @@ void averageThread(config* cfg) {
 		uint32_t pixelSum = 0;
 		for (uint32_t i = 0; i < (cfg->imageResX*  cfg->imageResY); i++)
 			pixelSum += curImg->diffBitmap[i] = curImg->rawBitmap[i] - cfg->trailingAverage->currentAverage[i];
-		curImg->avgValue = pixelSum / (cfg->imageResX*  cfg->imageResY);
+		//curImg->avgValue = pixelSum / (cfg->imageResX*  cfg->imageResY);
 
 		if (cfg->verbosity >= 3){
 			// diff image has a dynamic range of <= 9 bit (-256 to 256), spread it to 16 bit
 			uint16_t* tmp = new uint16_t[cfg->trailingAverage->imageSize];
 			for (uint32_t i = 0; i < cfg->trailingAverage->imageSize; i++)
 				tmp[i] = (curImg->diffBitmap[i] + 256) << 7; // offset 256, bits: 9 + 7 = 16
-			debugPng(curImg->fileName, "_diff.png", tmp);
+			//debugPng(curImg->fileName, "_diff.png", tmp);
 			delete tmp;
 		}
 #else //SIMPLE_AVERAGE
@@ -106,7 +105,7 @@ void averageThread(config* cfg) {
 		uint32_t pixelSum = 0;
 		for (uint32_t i = 0; i < (cfg->imageResX*  cfg->imageResY); i++)
 			pixelSum += curImg->diffBitmap[i] = cfg->leadingAverage->currentAverage[i] - cfg->trailingAverage->currentAverage[i];
-		curImg->avgValue = pixelSum / (cfg->imageResX*  cfg->imageResY);
+		//curImg->avgValue = pixelSum / (cfg->imageResX*  cfg->imageResY);
 
 #endif //SIMPLE_AVERAGE
 

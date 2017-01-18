@@ -31,10 +31,10 @@ struct bitmapInfoHeader {
 #pragma pack(pop)
 
 // Code loosely inspired by http://tipsandtricks.runicsoft.com/Cpp/BitmapTutorial.html
-uint8_t* bmp_read(const char* fileName, const uint32_t fileSize, const uint32_t width, const uint32_t height) {
+uint8_t* bmp_read(const wstring fileName, const uint64_t fileSize, const uint32_t width, const uint32_t height) {
 	// open output file
 	FILE* fIn;
-	if ((fIn = fopen(fileName, "rb")) == 0)
+	if ((fIn = _wfopen(fileName.c_str(), L"rb")) == 0)
 		throw runtime_error(NULL);
 
 	// allocate memory for the whole file and read it

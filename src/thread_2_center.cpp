@@ -1,6 +1,5 @@
 #include "definitions.h"
 #include "image_helper.h"
-#include "image_png.h"
 
 void moveImage(config* cfg, image* curImg, int32_t moveX, int32_t moveY) {
 	// crop centered image
@@ -83,8 +82,8 @@ void centerThread(config* cfg) {
 		*/
 
 		// save the image for debugging
-		if (cfg->verbosity >= 3)
-			debugPng(curImg->fileName, "_centered.png", curImg->rawBitmap);
+		//if (cfg->verbosity >= 3)
+		//	debugPng(curImg->fileName, "_centered.png", curImg->rawBitmap);
 
 		// send the image to the next thread
 		cfg->mAverage.lock();
