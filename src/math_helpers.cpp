@@ -116,17 +116,16 @@ void calcNoiseCorners(image *imgData, config* cfg){
 	int myints[] = {1,2,3,4};	
 	int bestResultInts[] = {1,2,3};
 	noise bestResult;
-	noise *results;
-	noise results = new noise[24];
+	noise *results = new noise[24];
 	counter = 0;
 	
 	do {
 		// calculate "sum" of averages and variances
-		results[counter] = combineNoise(corners[myints[0]], corners[myints[1]], corners[myints[2]]);
+		results[counter] = combineNoise(&corners[myints[0]], &corners[myints[1]], &corners[myints[2]]);
 		counter++;
 	} while ( std::next_permutation(myints,myints+4) );
-	for(noise result:results){
-		if(compareNoise(result, bestResult)){
+	for(noise result : results) {
+		if(compareNoise(&result, &bestResult)){
 			bestResult = result;
 		}
 	}
