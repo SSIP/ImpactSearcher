@@ -126,20 +126,39 @@ void calcNoiseCorners(image *imgData, config* cfg){
 	}
 	bottomRight = calcNoise(pixels);
 	
-	// least squares differences in avg and std dev, use the 3 closest corners
-	int myints[] = {1,2,3,4};
-
-	std::sort (myints,myints+4);
-
+	int myints[] = {1,2,3,4};	
+	int bestResultInts[] = {1,2,3};
+	noise bestResult;
+	noise *results;
+	noise results = new noise[24];
+	counter = 0;
+	
 	do {
 		// calculate "sum" of averages and variances
+		results[counter] = combineNoise(corners[myints[0]], corners[myints[1]], corners[myints[2]]);
+		counter++;
 	} while ( std::next_permutation(myints,myints+4) );
-
+	for(noise result:results){
+		if(compareNoise(result, bestResult)){
+			bestResult = result;
+		}
+	}
+	imgData->imgNoise = bestResult;
+	
 	delete[] pixels;
 }	
 
 noise calcNoise(uint32_t *pixels){
 
+}
+
+noise combineNoise(noise *corner1, noise *corner2, noise *corner3){
+	
+}
+
+bool compareNoise(noise *curResult, noise *bestResult){
+	// true if curResult is better than bestResult
+	return 1;
 }
 
 double getMean()
