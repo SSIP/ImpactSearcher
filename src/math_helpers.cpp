@@ -49,6 +49,44 @@ coordinates massCenter(image* frame, config* cfg){
 	return move;
 }
 
+noise calcNoise(uint32_t *pixels) {
+	return{ 0.0, 0.0, 0.0 };
+}
+
+noise combineNoise(noise *corner1, noise *corner2, noise *corner3) {
+	return{ 0.0, 0.0, 0.0 };
+}
+
+bool compareNoise(noise *curResult, noise *bestResult){
+	// true if curResult is better than bestResult
+	return 1;
+}
+
+double getMean()
+{
+	double sum = 0.0;
+	//for(double a : data)
+	//	sum += a;
+	//return sum/size;
+	return 0.0;
+}
+
+double getVariance()
+{
+	double mean = getMean();
+	double temp = 0;
+	//for(double a :data)
+	//	temp += (a-mean)*(a-mean);
+	//return temp/size;
+	return 0.0;
+}
+
+double getStdDev()
+{
+	//return Math.sqrt(getVariance());
+	return 0.0;
+}
+
 void calcNoiseCorners(image *imgData, config* cfg){
 	uint32_t maxDiameter, triHeight, triLeg, numPixels;
 	noise corners[4];
@@ -116,7 +154,7 @@ void calcNoiseCorners(image *imgData, config* cfg){
 	int myints[] = {1,2,3,4};	
 	int bestResultInts[] = {1,2,3};
 	noise bestResult;
-	noise *results = new noise[24];
+	noise results[24];
 	counter = 0;
 	
 	do {
@@ -133,38 +171,3 @@ void calcNoiseCorners(image *imgData, config* cfg){
 	
 	delete[] pixels;
 }	
-
-noise calcNoise(uint32_t *pixels){
-
-}
-
-noise combineNoise(noise *corner1, noise *corner2, noise *corner3){
-	
-}
-
-bool compareNoise(noise *curResult, noise *bestResult){
-	// true if curResult is better than bestResult
-	return 1;
-}
-
-double getMean()
-{
-	double sum = 0.0;
-	//for(double a : data)
-	//	sum += a;
-	//return sum/size;
-}
-
-double getVariance()
-{
-	double mean = getMean();
-	double temp = 0;
-	//for(double a :data)
-	//	temp += (a-mean)*(a-mean);
-	//return temp/size;
-}
-
-double getStdDev()
-{
-	//return Math.sqrt(getVariance());
-}
