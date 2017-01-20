@@ -14,6 +14,12 @@
 
 using namespace std;
 
+#if defined _WIN32 || defined __CYGWIN__ || defined __MINGW32__
+#define SNPRINTF _snprintf
+#else
+#define SNPRINTF snprintf
+#endif
+
 enum enumKeepFrames {
 	KEEP_NONE,
 	KEEP_ALL,

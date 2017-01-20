@@ -1,12 +1,6 @@
 #include "definitions.h"
 #include "image_helper.h"
 
-class something
-{
-}
-
-uint32_t asdf;
-
 // set library export macros
 #if defined _WIN32 || defined __CYGWIN__ || defined __MINGW32__
 	#ifdef BUILDING_LIB
