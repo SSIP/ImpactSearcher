@@ -9,7 +9,9 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <cstdint>
+#include <memory.h>
 #include <string>
+
 using namespace std;
 
 #if defined _WIN32 || defined __CYGWIN__ || defined __MINGW32__

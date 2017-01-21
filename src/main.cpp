@@ -32,3 +32,4 @@ LIB_PUBLIC void impactSearcherStop(config *cfg) {
 	// signal the threads to end
 	cfg->shutdownThread = 1;
 }
+
