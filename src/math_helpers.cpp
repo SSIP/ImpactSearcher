@@ -49,8 +49,35 @@ coordinates massCenter(image* frame, config* cfg){
 	return move;
 }
 
+double getAvg(uint32_t *pixels)
+{
+	uint64_t sum = 0;
+	for(uint32_t x = 0; x < sizeof(pixels); x++){
+		sum += pixels[x];
+	}
+	return sum/sizeof(pixels);
+}
+
+double getVariance(double mean, uint32_t *pixels)
+{
+	// is a double_t sufficient for the numbers?
+	double_t temp = 0;
+	for(uint32_t x = 0; x < sizeof(pixels); x++){
+		temp += (pixels[x]-mean)*(pixels[x]-mean);
+	}
+	return temp/sizeof(pixels);
+}
+
+double getStdDev(double variance)
+{
+	return sqrt(variance);
+}
+
 noise calcNoise(uint32_t *pixels) {
-	return{ 0.0, 0.0, 0.0 };
+	double average = getAvg(pixels);
+	double variance = getVariance(average, pixels);
+	double stdDev = getStdDev(variance);
+	return{average,variance,stdDev};
 }
 
 noise combineNoise(noise *corner1, noise *corner2, noise *corner3) {
@@ -60,31 +87,6 @@ noise combineNoise(noise *corner1, noise *corner2, noise *corner3) {
 bool compareNoise(noise *curResult, noise *bestResult){
 	// true if curResult is better than bestResult
 	return 1;
-}
-
-double getMean()
-{
-	double sum = 0.0;
-	//for(double a : data)
-	//	sum += a;
-	//return sum/size;
-	return 0.0;
-}
-
-double getVariance()
-{
-	double mean = getMean();
-	double temp = 0;
-	//for(double a :data)
-	//	temp += (a-mean)*(a-mean);
-	//return temp/size;
-	return 0.0;
-}
-
-double getStdDev()
-{
-	//return Math.sqrt(getVariance());
-	return 0.0;
 }
 
 void calcNoiseCorners(image *imgData, config* cfg){

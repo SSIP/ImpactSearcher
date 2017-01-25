@@ -53,7 +53,7 @@ struct impact {
 };
 
 struct noise {
-	double variance, stdDev, average;
+	double average, variance, stdDev;
 };
 
 struct image {
