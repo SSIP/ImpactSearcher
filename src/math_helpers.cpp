@@ -84,11 +84,6 @@ noise combineNoise(noise *corner1, noise *corner2, noise *corner3) {
 	return{ 0.0, 0.0, 0.0 };
 }
 
-bool compareNoise(noise *curResult, noise *bestResult){
-	// true if curResult is better than bestResult
-	return 1;
-}
-
 void calcNoiseCorners(image *imgData, config* cfg){
 	uint32_t maxDiameter, triHeight, triLeg, numPixels;
 	noise corners[4];
