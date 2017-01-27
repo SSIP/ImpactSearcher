@@ -49,42 +49,52 @@ coordinates massCenter(image* frame, config* cfg){
 	return move;
 }
 
+double getAvg(uint32_t *pixels)
+{
+	uint64_t sum = 0;
+	for(uint32_t x = 0; x < sizeof(pixels); x++){
+		sum += pixels[x];
+	}
+	return sum/sizeof(pixels);
+}
+
+double getVariance(double mean, uint32_t *pixels)
+{
+	// is a double_t sufficient for the numbers?
+	double_t temp = 0;
+	for(uint32_t x = 0; x < sizeof(pixels); x++){
+		temp += (pixels[x]-mean)*(pixels[x]-mean);
+	}
+	return temp/sizeof(pixels);
+}
+
+double getStdDev(double variance)
+{
+	return sqrt(variance);
+}
+
 noise calcNoise(uint32_t *pixels) {
-	return{ 0.0, 0.0, 0.0 };
+	noise result;
+	result.average = getAvg(pixels);
+	result.variance = getVariance(result.average, pixels);
+	result.stdDev = getStdDev(result.variance);
+	result.sampleSize = sizeof(pixels);
+	return result;
 }
 
-noise combineNoise(noise *corner1, noise *corner2, noise *corner3) {
-	return{ 0.0, 0.0, 0.0 };
-}
-
-bool compareNoise(noise *curResult, noise *bestResult){
-	// true if curResult is better than bestResult
-	return 1;
-}
-
-double getMean()
-{
-	double sum = 0.0;
-	//for(double a : data)
-	//	sum += a;
-	//return sum/size;
-	return 0.0;
-}
-
-double getVariance()
-{
-	double mean = getMean();
-	double temp = 0;
-	//for(double a :data)
-	//	temp += (a-mean)*(a-mean);
-	//return temp/size;
-	return 0.0;
-}
-
-double getStdDev()
-{
-	//return Math.sqrt(getVariance());
-	return 0.0;
+noise combineNoise(noise *noises) {
+	noise result;
+	if(sizeof(noises) == 2){
+		result.average = (double)(noises[0].average + noises[1].average)/2;
+		result.variance = ((noises[0].sampleSize - 1) * (noises[0].variance + noises[1].variance) + (noises[0].sampleSize / 2) * pow(noises[0].average - noises[1].average, 2)) / (2 * noises[0].sampleSize - 1);
+		result.stdDev = sqrt(result.variance);
+	} else if(sizeof(noises) == 3) {
+		result.average = (noises[0].average + noises[1].average + noises[2].average)/3;
+		result.variance = 0;
+		result.stdDev = sqrt(result.variance);
+	} else {
+		return{ 0.0, 0.0, 0.0 };
+	}
 }
 
 void calcNoiseCorners(image *imgData, config* cfg){
@@ -151,23 +161,41 @@ void calcNoiseCorners(image *imgData, config* cfg){
 			pixels[counter] = imgData->rawBitmap[y * cfg->imageResX + x];
 	noise bottomRight = calcNoise(pixels);
 	
-	int myints[] = {1,2,3,4};	
-	int bestResultInts[] = {1,2,3};
-	noise bestResult;
-	noise results[24];
-	counter = 0;
+	// combine 3 variances, means of 4 times
+	// each time exlcude 1 corner
+	// combExcl[0 to 3]
+	noise combCrnExcl[4];
+	noise noises[4][3] = {{topLeft, bottomLeft, bottomRight},{bottomLeft, bottomRight, topRight},{bottomRight, topRight, topLeft},{topRight, topLeft, bottomLeft}};
+	combCrnExcl[0] = combineNoise(noises[0]);
+	combCrnExcl[1] = combineNoise(noises[1]);
+	combCrnExcl[2] = combineNoise(noises[2]);
+	combCrnExcl[3] = combineNoise(noises[3]);
 	
-	do {
-		// calculate "sum" of averages and variances
-		results[counter] = combineNoise(&corners[myints[0]], &corners[myints[1]], &corners[myints[2]]);
-		counter++;
-	} while ( std::next_permutation(myints,myints+4) );
-	for(noise result : results) {
-		if(compareNoise(&result, &bestResult)){
-			bestResult = result;
-		}
+	// simple k.o.-system, smallest Standard Deviation wins
+	
+	int round1, round2, round3;
+	// round #1: winner of 0 vs 1
+	if(combCrnExcl[0].stdDev > combCrnExcl[1].stdDev){
+		round1 = 0;
+	} else {
+		round1 = 1;
 	}
-	imgData->imgNoise = bestResult;
+	
+	// round #2: winner of 2 vs 3
+	if(combCrnExcl[2].stdDev > combCrnExcl[3].stdDev){
+		round1 = 2;
+	} else {
+		round1 = 3;
+	}
+	
+	// round #3: winner of round #1 vs winner of round #2
+	if(combCrnExcl[round1].stdDev > combCrnExcl[round2].stdDev){
+		round3 = round1;
+	} else {
+		round3 = round2;
+	}
+	
+	imgData->imgNoise = combCrnExcl[round3];
 	
 	delete[] pixels;
 }	
