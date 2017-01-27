@@ -153,23 +153,40 @@ void calcNoiseCorners(image *imgData, config* cfg){
 			pixels[counter] = imgData->rawBitmap[y * cfg->imageResX + x];
 	noise bottomRight = calcNoise(pixels);
 	
-	int myints[] = {1,2,3,4};	
-	int bestResultInts[] = {1,2,3};
-	noise bestResult;
-	noise results[24];
-	counter = 0;
+	// combine 3 variances, means of 4 times
+	// each time exlcude 1 corner
+	// combExcl[0 to 3]
+	noise combCrnExl[4];
+	combCrnExl[0] = combineNoise(topLeft, bottomLeft, bottomRight);
+	combCrnExl[1] = combineNoise(bottomLeft, bottomRight, topRight);
+	combCrnExl[2] = combineNoise(bottomRight, topRight, topLeft);
+	combCrnExl[3] = combineNoise(topRight, topLeft, bottomLeft);
 	
-	do {
-		// calculate "sum" of averages and variances
-		results[counter] = combineNoise(&corners[myints[0]], &corners[myints[1]], &corners[myints[2]]);
-		counter++;
-	} while ( std::next_permutation(myints,myints+4) );
-	for(noise result : results) {
-		if(compareNoise(&result, &bestResult)){
-			bestResult = result;
-		}
+	// simple k.o.-system, smallest Standard Deviation wins
+	
+	int round1, round2, round3;
+	// round #1: winner of 0 vs 1
+	if(combCrnExl[0]->stdDev > combCrnExcl[1]->stdDev){
+		round1 = 0;
+	} else {
+		round1 = 1;
 	}
-	imgData->imgNoise = bestResult;
+	
+	// round #2: winner of 2 vs 3
+	if(combCrnExl[2]->stdDev > combCrnExcl[3]->stdDev){
+		round1 = 2;
+	} else {
+		round1 = 3;
+	}
+	
+	// round #3: winner of round #1 vs winner of round #2
+	if(combCrnExl[round1]->stdDev > combCrnExcl[round2]->stdDev){
+		round3 = round1;
+	} else {
+		round3 = round2;
+	}
+	
+	imgData->imgNoise = combCrnExl[round3];
 	
 	delete[] pixels;
 }	
