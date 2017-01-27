@@ -84,10 +84,12 @@ noise combineNoise(noise *noises) {
 	noise result;
 	if(sizeof(noises) == 2){
 		result->average = (noises[0]->average + noises[1]->average)/2;
-		result->variance = 0;
+		result->variance = ((noises[0]->sampleSize - 1) * (noises[0]->variance + noises[1]->variance) + (noises[0]->sampleSize / 2) * pow(noises[0]->average - noises[1], 2)) / (2 * noises[0]->sampleSize - 1);
 		result->stdDev = sqrt(result->variance);
 	} elseeif(sizeof(noises) == 3) {
-		
+		result->average = (noises[0]->average + noises[1]->average + noise[2])/3;
+		result->variance = 0;
+		result->stdDev = sqrt(result->variance);
 	} else {
 		return{ 0.0, 0.0, 0.0 };
 	}

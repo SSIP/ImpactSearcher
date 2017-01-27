@@ -54,6 +54,7 @@ struct impact {
 
 struct noise {
 	double average, variance, stdDev;
+	uint32_t sampleSize;
 };
 
 struct image {
