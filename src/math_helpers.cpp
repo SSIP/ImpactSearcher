@@ -80,8 +80,17 @@ noise calcNoise(uint32_t *pixels) {
 	return{average,variance,stdDev};
 }
 
-noise combineNoise(noise *corner1, noise *corner2, noise *corner3) {
-	return{ 0.0, 0.0, 0.0 };
+noise combineNoise(noise *noises) {
+	noise result;
+	if(sizeof(noises) == 2){
+		result->average = (noises[0]->average + noises[1]->average)/2;
+		result->variance = 0;
+		result->stdDev = sqrt(result->variance);
+	} elseeif(sizeof(noises) == 3) {
+		
+	} else {
+		return{ 0.0, 0.0, 0.0 };
+	}
 }
 
 void calcNoiseCorners(image *imgData, config* cfg){
