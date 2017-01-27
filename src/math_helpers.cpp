@@ -74,22 +74,24 @@ double getStdDev(double variance)
 }
 
 noise calcNoise(uint32_t *pixels) {
-	double average = getAvg(pixels);
-	double variance = getVariance(average, pixels);
-	double stdDev = getStdDev(variance);
-	return{average,variance,stdDev};
+	noise result;
+	result.average = getAvg(pixels);
+	result.variance = getVariance(result.average, pixels);
+	result.stdDev = getStdDev(result.variance);
+	result.sampleSize = sizeof(pixels);
+	return result;
 }
 
 noise combineNoise(noise *noises) {
 	noise result;
 	if(sizeof(noises) == 2){
-		result->average = (noises[0]->average + noises[1]->average)/2;
-		result->variance = ((noises[0]->sampleSize - 1) * (noises[0]->variance + noises[1]->variance) + (noises[0]->sampleSize / 2) * pow(noises[0]->average - noises[1], 2)) / (2 * noises[0]->sampleSize - 1);
-		result->stdDev = sqrt(result->variance);
-	} elseeif(sizeof(noises) == 3) {
-		result->average = (noises[0]->average + noises[1]->average + noise[2])/3;
-		result->variance = 0;
-		result->stdDev = sqrt(result->variance);
+		result.average = (double)(noises[0].average + noises[1].average)/2;
+		result.variance = ((noises[0].sampleSize - 1) * (noises[0].variance + noises[1].variance) + (noises[0].sampleSize / 2) * pow(noises[0].average - noises[1].average, 2)) / (2 * noises[0].sampleSize - 1);
+		result.stdDev = sqrt(result.variance);
+	} else if(sizeof(noises) == 3) {
+		result.average = (noises[0].average + noises[1].average + noises[2].average)/3;
+		result.variance = 0;
+		result.stdDev = sqrt(result.variance);
 	} else {
 		return{ 0.0, 0.0, 0.0 };
 	}
@@ -162,37 +164,38 @@ void calcNoiseCorners(image *imgData, config* cfg){
 	// combine 3 variances, means of 4 times
 	// each time exlcude 1 corner
 	// combExcl[0 to 3]
-	noise combCrnExl[4];
-	combCrnExl[0] = combineNoise(topLeft, bottomLeft, bottomRight);
-	combCrnExl[1] = combineNoise(bottomLeft, bottomRight, topRight);
-	combCrnExl[2] = combineNoise(bottomRight, topRight, topLeft);
-	combCrnExl[3] = combineNoise(topRight, topLeft, bottomLeft);
+	noise combCrnExcl[4];
+	noise noises[4][3] = {{topLeft, bottomLeft, bottomRight},{bottomLeft, bottomRight, topRight},{bottomRight, topRight, topLeft},{topRight, topLeft, bottomLeft}};
+	combCrnExcl[0] = combineNoise(noises[0]);
+	combCrnExcl[1] = combineNoise(noises[1]);
+	combCrnExcl[2] = combineNoise(noises[2]);
+	combCrnExcl[3] = combineNoise(noises[3]);
 	
 	// simple k.o.-system, smallest Standard Deviation wins
 	
 	int round1, round2, round3;
 	// round #1: winner of 0 vs 1
-	if(combCrnExl[0]->stdDev > combCrnExcl[1]->stdDev){
+	if(combCrnExcl[0].stdDev > combCrnExcl[1].stdDev){
 		round1 = 0;
 	} else {
 		round1 = 1;
 	}
 	
 	// round #2: winner of 2 vs 3
-	if(combCrnExl[2]->stdDev > combCrnExcl[3]->stdDev){
+	if(combCrnExcl[2].stdDev > combCrnExcl[3].stdDev){
 		round1 = 2;
 	} else {
 		round1 = 3;
 	}
 	
 	// round #3: winner of round #1 vs winner of round #2
-	if(combCrnExl[round1]->stdDev > combCrnExcl[round2]->stdDev){
+	if(combCrnExcl[round1].stdDev > combCrnExcl[round2].stdDev){
 		round3 = round1;
 	} else {
 		round3 = round2;
 	}
 	
-	imgData->imgNoise = combCrnExl[round3];
+	imgData->imgNoise = combCrnExcl[round3];
 	
 	delete[] pixels;
 }	
