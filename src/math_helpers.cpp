@@ -68,11 +68,6 @@ double getVariance(double mean, uint32_t *pixels)
 	return temp/sizeof(pixels);
 }
 
-double getStdDev(double variance)
-{
-	return sqrt(variance);
-}
-
 noise calcNoise(uint32_t *pixels) {
 	noise result;
 	result.average = getAvg(pixels);
@@ -82,24 +77,8 @@ noise calcNoise(uint32_t *pixels) {
 	return result;
 }
 
-noise combineNoise(noise *noises) {
-	noise result;
-	if(sizeof(noises) == 2){
-		result.average = (double)(noises[0].average + noises[1].average)/2;
-		result.variance = ((noises[0].sampleSize - 1) * (noises[0].variance + noises[1].variance) + (noises[0].sampleSize / 2) * pow(noises[0].average - noises[1].average, 2)) / (2 * noises[0].sampleSize - 1);
-		result.stdDev = sqrt(result.variance);
-	} else if(sizeof(noises) == 3) {
-		result.average = (noises[0].average + noises[1].average + noises[2].average)/3;
-		result.variance = 0;
-		result.stdDev = sqrt(result.variance);
-	} else {
-		return{ 0.0, 0.0, 0.0 };
-	}
-}
-
 void calcNoiseCorners(image *imgData, config* cfg){
 	uint32_t maxDiameter, triHeight, triLeg, numPixels;
-	noise corners[4];
 	
 	if (cfg->imageResX > cfg->imageResY){
 		maxDiameter = (uint32_t)(cfg->imageResY + cfg->imageResY * 0.2);
@@ -109,7 +88,7 @@ void calcNoiseCorners(image *imgData, config* cfg){
 	}
 	triHeight = sqrt(2*pow(maxDiameter,2));
 	triLeg = (uint32_t)sqrt(2)*triHeight;
-	numPixels = (uint32_t)(0.5 * pow(2*triLeg,2));
+	numPixels = 4*(uint32_t)(0.5 * pow(2*triLeg,2));
 	uint32_t *pixels = new uint32_t[numPixels];
 	uint32_t y,counter;
 
@@ -134,68 +113,83 @@ void calcNoiseCorners(image *imgData, config* cfg){
  *  Y axis
  */
 
+	double corners[4];
 	// top left
-	for (uint32_t x = 0; x < triLeg; x++)
-		for (uint32_t y = 0; y <= triLeg - x; y++)
-			pixels[counter++] = imgData->rawBitmap[y * cfg->imageResX + x];
-	noise topLeft = calcNoise(pixels);
+	for (uint32_t x = 0; x < triLeg; x++){
+		for (uint32_t y = 0; y <= triLeg - x; y++) {
+			pixels[counter] = imgData->rawBitmap[y * cfg->imageResX + x];
+		}
+	}
+	corners[0] = getAvg(pixels);
 	
 	counter = 0;
 	// bottom left
-	for (uint32_t x = 0; x < triLeg; x++)
-		for (uint32_t y = cfg->imageResY - triLeg + x; y < cfg->imageResY ; y++)
-			pixels[counter++] = imgData->rawBitmap[y * cfg->imageResX + x];
-	noise bottomLeft = calcNoise(pixels);
+	for (uint32_t x = 0; x < triLeg; x++) {
+		for (uint32_t y = cfg->imageResY - triLeg + x; y < cfg->imageResY ; y++) {
+			pixels[counter] = imgData->rawBitmap[y * cfg->imageResX + x];
+		}
+	}
+	corners[1] = getAvg(pixels);
 	
 	counter = 0;
 	// top right
-	for (uint32_t x = cfg->imageResX - triLeg; x < cfg->imageResX; x++)
-		for (uint32_t y = 0; y < (x - cfg->imageResX + triLeg); y++)
-			pixels[counter++] = imgData->rawBitmap[y * cfg->imageResX + x];
-	noise topRight = calcNoise(pixels);
+	for (uint32_t x = cfg->imageResX - triLeg; x < cfg->imageResX; x++) {
+		for (uint32_t y = 0; y < (x - cfg->imageResX + triLeg); y++) {
+			pixels[counter] = imgData->rawBitmap[y * cfg->imageResX + x];
+		}
+	}
+	corners[2] = getAvg(pixels);
 	
 	counter = 0;
 	// bottom right
-	for (uint32_t x = cfg->imageResX - triLeg; x < cfg->imageResX; x++)
-		for (uint32_t y = cfg->imageResY - (x - cfg->imageResX + triLeg); y < cfg->imageResY; y++)
+	for (uint32_t x = cfg->imageResX - triLeg; x < cfg->imageResX; x++) {
+		for (uint32_t y = cfg->imageResY - (x - cfg->imageResX + triLeg); y < cfg->imageResY; y++) {
 			pixels[counter] = imgData->rawBitmap[y * cfg->imageResX + x];
-	noise bottomRight = calcNoise(pixels);
+		}
+	}
+	corners[4] = getAvg(pixels);
 	
-	// combine 3 variances, means of 4 times
-	// each time exlcude 1 corner
-	// combExcl[0 to 3]
-	noise combCrnExcl[4];
-	noise noises[4][3] = {{topLeft, bottomLeft, bottomRight},{bottomLeft, bottomRight, topRight},{bottomRight, topRight, topLeft},{topRight, topLeft, bottomLeft}};
-	combCrnExcl[0] = combineNoise(noises[0]);
-	combCrnExcl[1] = combineNoise(noises[1]);
-	combCrnExcl[2] = combineNoise(noises[2]);
-	combCrnExcl[3] = combineNoise(noises[3]);
-	
-	// simple k.o.-system, smallest Standard Deviation wins
+	// simple k.o.-system, highest mean looses
 	
 	int round1, round2, round3;
-	// round #1: winner of 0 vs 1
-	if(combCrnExcl[0].stdDev > combCrnExcl[1].stdDev){
+	// round #1: looser of 0 vs 1
+	if(corners[0] > corners[1]){
 		round1 = 0;
 	} else {
 		round1 = 1;
 	}
 	
-	// round #2: winner of 2 vs 3
-	if(combCrnExcl[2].stdDev > combCrnExcl[3].stdDev){
+	// round #2: looser of 2 vs 3
+	if(corners[2] > corners[3]){
 		round1 = 2;
 	} else {
 		round1 = 3;
 	}
 	
-	// round #3: winner of round #1 vs winner of round #2
-	if(combCrnExcl[round1].stdDev > combCrnExcl[round2].stdDev){
+	// round #3: looser of round #1 vs looser of round #2
+	if(corners[round1] > corners[round2]){
 		round3 = round1;
 	} else {
 		round3 = round2;
 	}
+	uint32_t *totalPixels = new uint32_t[3*numPixels];
+	double sum = 0;
+	uint32_t m = 0;
+	for(uint32_t n = 0; n < 4; n++){
+		if(n == round3) {
+			
+		} else {
+			sum = sum + corners[n];
+			for(uint32_t x = 0; x < numPixels; x++){
+				totalPixels[m * numPixels + x] = pixels[n * numPixels + x];
+			}
+			m++;
+		}
+	}
+	double totalAvg = sum / 3;
+	double variance = getVariance(totalAvg, totalPixels);
+	double stdDev = sqrt(variance);
 	
-	imgData->imgNoise = combCrnExcl[round3];
-	
+	delete[] totalPixels;
 	delete[] pixels;
 }	
