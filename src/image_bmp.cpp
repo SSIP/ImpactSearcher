@@ -55,7 +55,7 @@ uint8_t* bmp_read(const string fileName, const uint64_t fileSize, const uint32_t
 
 	// check if the image corresponds to our needs
 	// check "BM" magic bytes (little endian)
-	if (file_header->bfType != 'MB')
+	if (memcmp((char*) file_header->bfType, "MB", 2))
 		throw runtime_error(NULL);
 	// if sizes don't match, the file is corrupted
 	if (file_header->bfSize != fileSize)

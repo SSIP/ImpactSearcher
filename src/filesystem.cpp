@@ -4,11 +4,13 @@
 	#define WIN32_LEAN_AND_MEAN
 	#include <Windows.h>
 #else
+	#include <sys/types.h>
+	#include <sys/stat.h>
 	#include <dirent.h>
 	#include <unistd.h>
 #endif
 
-list<fileInf> getFiles(string dir, string extension) {
+list<fileInf> getFiles(string _dir, string extension) {
 	// note: all FAT file systems will return files unsorted, so please do not use FAT!
 
 	list<fileInf> retval;
@@ -16,7 +18,7 @@ list<fileInf> getFiles(string dir, string extension) {
 #ifdef WIN32
 
 	// build search string (also accept trailing backslash in dir parameter)
-	string directory = "\\\\?\\" + dir + (dir[dir.length() - 1] != '\\' ? "\\" : "");
+	string directory = "\\\\?\\" + _dir + (_dir[_dir.length() - 1] != '\\' ? "\\" : "");
 
 	WIN32_FIND_DATA ffd;
 	HANDLE hfind = nullptr;
@@ -47,11 +49,11 @@ list<fileInf> getFiles(string dir, string extension) {
 #else
 
 	// build search string (also accept trailing slash in dir parameter)
-	string directory = dir + (dir[dir.length() - 1] != L'/' ? L"/" : L"");
+	string directory = _dir + (_dir[_dir.length() - 1] != '/' ? "/" : "");
 
 	DIR *dir;
 	dirent *file;
-	stat st;
+	struct stat st;
 
 	if ((dir = opendir(directory.c_str())) == nullptr)
 		return retval;
@@ -71,9 +73,9 @@ list<fileInf> getFiles(string dir, string extension) {
 			continue;
 
 		// this is a file, check its extension
-		wchar_t *pExtension = file->d_name + wcslen(file->d_name) - extension.length();
+		char *pExtension = file->d_name + strlen(file->d_name) - extension.length();
 
-		if (wcscmp(pExtension, extension.c_str()) == 0) {
+		if (strcmp(pExtension, extension.c_str()) == 0) {
 			// save full path and size
 			fileInf fi;
 			fi.name = fileName;
