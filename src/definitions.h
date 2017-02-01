@@ -9,7 +9,9 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <cstdint>
+#include <memory.h>
 #include <string>
+
 using namespace std;
 
 #if defined _WIN32 || defined __CYGWIN__ || defined __MINGW32__
@@ -57,7 +59,8 @@ struct impact {
 };
 
 struct noise {
-	double variance, stdDev, average;
+	double average, variance, stdDev;
+	uint32_t sampleSize;
 };
 
 struct image {

@@ -49,47 +49,36 @@ coordinates massCenter(image* frame, config* cfg){
 	return move;
 }
 
+double getAvg(uint32_t *pixels)
+{
+	uint64_t sum = 0;
+	for(uint32_t x = 0; x < sizeof(pixels); x++){
+		sum += pixels[x];
+	}
+	return sum/sizeof(pixels);
+}
+
+double getVariance(double mean, uint32_t *pixels)
+{
+	// is a double_t sufficient for the numbers?
+	double_t temp = 0;
+	for(uint32_t x = 0; x < sizeof(pixels); x++){
+		temp += (pixels[x]-mean)*(pixels[x]-mean);
+	}
+	return temp/sizeof(pixels);
+}
+
 noise calcNoise(uint32_t *pixels) {
-	return{ 0.0, 0.0, 0.0 };
-}
-
-noise combineNoise(noise *corner1, noise *corner2, noise *corner3) {
-	return{ 0.0, 0.0, 0.0 };
-}
-
-bool compareNoise(noise *curResult, noise *bestResult){
-	// true if curResult is better than bestResult
-	return 1;
-}
-
-double getMean()
-{
-	double sum = 0.0;
-	//for(double a : data)
-	//	sum += a;
-	//return sum/size;
-	return 0.0;
-}
-
-double getVariance()
-{
-	double mean = getMean();
-	double temp = 0;
-	//for(double a :data)
-	//	temp += (a-mean)*(a-mean);
-	//return temp/size;
-	return 0.0;
-}
-
-double getStdDev()
-{
-	//return Math.sqrt(getVariance());
-	return 0.0;
+	noise result;
+	result.average = getAvg(pixels);
+	result.variance = getVariance(result.average, pixels);
+	result.stdDev = getStdDev(result.variance);
+	result.sampleSize = sizeof(pixels);
+	return result;
 }
 
 void calcNoiseCorners(image *imgData, config* cfg){
 	uint32_t maxDiameter, triHeight, triLeg, numPixels;
-	noise corners[4];
 	
 	if (cfg->imageResX > cfg->imageResY){
 		maxDiameter = (uint32_t)(cfg->imageResY + cfg->imageResY * 0.2);
@@ -99,7 +88,7 @@ void calcNoiseCorners(image *imgData, config* cfg){
 	}
 	triHeight = sqrt(2*pow(maxDiameter,2));
 	triLeg = (uint32_t)sqrt(2)*triHeight;
-	numPixels = (uint32_t)(0.5 * pow(2*triLeg,2));
+	numPixels = 4*(uint32_t)(0.5 * pow(2*triLeg,2));
 	uint32_t *pixels = new uint32_t[numPixels];
 	uint32_t y, counter = 0;
 
@@ -124,50 +113,83 @@ void calcNoiseCorners(image *imgData, config* cfg){
  *  Y axis
  */
 
+	double corners[4];
 	// top left
-	for (uint32_t x = 0; x < triLeg; x++)
-		for (uint32_t y = 0; y <= triLeg - x; y++)
-			pixels[counter++] = imgData->rawBitmap[y * cfg->imageResX + x];
-	noise topLeft = calcNoise(pixels);
+	for (uint32_t x = 0; x < triLeg; x++){
+		for (uint32_t y = 0; y <= triLeg - x; y++) {
+			pixels[counter] = imgData->rawBitmap[y * cfg->imageResX + x];
+		}
+	}
+	corners[0] = getAvg(pixels);
 	
 	counter = 0;
 	// bottom left
-	for (uint32_t x = 0; x < triLeg; x++)
-		for (uint32_t y = cfg->imageResY - triLeg + x; y < cfg->imageResY ; y++)
-			pixels[counter++] = imgData->rawBitmap[y * cfg->imageResX + x];
-	noise bottomLeft = calcNoise(pixels);
+	for (uint32_t x = 0; x < triLeg; x++) {
+		for (uint32_t y = cfg->imageResY - triLeg + x; y < cfg->imageResY ; y++) {
+			pixels[counter] = imgData->rawBitmap[y * cfg->imageResX + x];
+		}
+	}
+	corners[1] = getAvg(pixels);
 	
 	counter = 0;
 	// top right
-	for (uint32_t x = cfg->imageResX - triLeg; x < cfg->imageResX; x++)
-		for (uint32_t y = 0; y < (x - cfg->imageResX + triLeg); y++)
-			pixels[counter++] = imgData->rawBitmap[y * cfg->imageResX + x];
-	noise topRight = calcNoise(pixels);
+	for (uint32_t x = cfg->imageResX - triLeg; x < cfg->imageResX; x++) {
+		for (uint32_t y = 0; y < (x - cfg->imageResX + triLeg); y++) {
+			pixels[counter] = imgData->rawBitmap[y * cfg->imageResX + x];
+		}
+	}
+	corners[2] = getAvg(pixels);
 	
 	counter = 0;
 	// bottom right
-	for (uint32_t x = cfg->imageResX - triLeg; x < cfg->imageResX; x++)
-		for (uint32_t y = cfg->imageResY - (x - cfg->imageResX + triLeg); y < cfg->imageResY; y++)
+	for (uint32_t x = cfg->imageResX - triLeg; x < cfg->imageResX; x++) {
+		for (uint32_t y = cfg->imageResY - (x - cfg->imageResX + triLeg); y < cfg->imageResY; y++) {
 			pixels[counter] = imgData->rawBitmap[y * cfg->imageResX + x];
-	noise bottomRight = calcNoise(pixels);
-	
-	int myints[] = {1,2,3,4};	
-	int bestResultInts[] = {1,2,3};
-	noise bestResult;
-	noise results[24];
-	counter = 0;
-	
-	do {
-		// calculate "sum" of averages and variances
-		results[counter] = combineNoise(&corners[myints[0]], &corners[myints[1]], &corners[myints[2]]);
-		counter++;
-	} while ( std::next_permutation(myints,myints+4) );
-	for(noise result : results) {
-		if(compareNoise(&result, &bestResult)){
-			bestResult = result;
 		}
 	}
-	imgData->imgNoise = bestResult;
+	corners[4] = getAvg(pixels);
 	
+	// simple k.o.-system, highest mean looses
+	
+	int round1, round2, round3;
+	// round #1: looser of 0 vs 1
+	if(corners[0] > corners[1]){
+		round1 = 0;
+	} else {
+		round1 = 1;
+	}
+	
+	// round #2: looser of 2 vs 3
+	if(corners[2] > corners[3]){
+		round1 = 2;
+	} else {
+		round1 = 3;
+	}
+	
+	// round #3: looser of round #1 vs looser of round #2
+	if(corners[round1] > corners[round2]){
+		round3 = round1;
+	} else {
+		round3 = round2;
+	}
+	uint32_t *totalPixels = new uint32_t[3*numPixels];
+	double sum = 0;
+	uint32_t m = 0;
+	for(uint32_t n = 0; n < 4; n++){
+		if(n == round3) {
+			
+		} else {
+			sum = sum + corners[n];
+			for(uint32_t x = 0; x < numPixels; x++){
+				totalPixels[m * numPixels + x] = pixels[n * numPixels + x];
+			}
+			m++;
+		}
+	}
+	double totalAvg = sum / 3;
+	double variance = getVariance(totalAvg, totalPixels);
+	double stdDev = sqrt(variance);
+	
+	delete[] totalPixels;
 	delete[] pixels;
 }	

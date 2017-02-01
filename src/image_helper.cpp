@@ -172,6 +172,7 @@ void tarFile::setHeader(char* fileName, unsigned long long fileSize, unsigned lo
 
 	// set the header structure
 	memset(this->header.name, 0, sizeof this->header.name);
+
 	strcpy((char*) this->header.name, (const char*)fileName);
 	SNPRINTF((char*) this->header.size, 11, "%11o", fileSize);
 	SNPRINTF((char*) this->header.mtime, 11, "%11o", fileTime);
@@ -181,6 +182,7 @@ void tarFile::setHeader(char* fileName, unsigned long long fileSize, unsigned lo
 	uint32_t checksum = 0;
 	for(uint32_t i = 0; i < 512; i++)
 		checksum += this->header.rawHeader[i];
+
 	SNPRINTF((char*) this->header.checksum, 6, "%6o", checksum);
 	this->header.checksum[7] = 0;
 }
