@@ -114,7 +114,7 @@ void checkThread(config* cfg) {
 		curImg->stdDev = sqrt(curImg->varianceValue);
 
 		if (cfg->verbosity >= 2)
-			WARNX((std::tstring(curImg->fileName) + ": stdDev=" + std::to_string(curImg->stdDev)).c_str());
+			WARNX((std::string(curImg->fileName) + ": stdDev=" + std::to_string(curImg->stdDev)).c_str());
 
 		//check for interesting pixels
 		bool imgIsInteresting = false;

@@ -2,9 +2,9 @@
 #include "definitions.h"
 
 struct fileInf {
-	tstring name;
+	string name;
 	uint64_t size;
 };
 
-list<fileInf> getFiles(tstring dir, tstring extension);
+list<fileInf> getFiles(string dir, string extension);
 void deleteFiles(list<fileInf> files);

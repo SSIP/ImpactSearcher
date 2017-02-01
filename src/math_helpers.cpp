@@ -45,7 +45,7 @@ coordinates massCenter(image* frame, config* cfg){
 	move.x = -(int32_t)((sumX / sumTotal) - cfg->imageResX / 2);
 	move.y = (sumY / sumTotal) - cfg->imageResY / 2;
 	if (cfg->verbosity >= 3)
-		fwprintf(stderr, (tstring(frame->fileName) + L": moveX=" + to_tstring(move.x) + L", moveY=" + to_tstring(move.y) + L"\n").c_str());
+		fprintf(stderr, (string(frame->fileName) + ": moveX=" + to_string(move.x) + ", moveY=" + to_string(move.y) + "\n").c_str());
 	return move;
 }
 
@@ -72,7 +72,7 @@ noise calcNoise(uint32_t *pixels) {
 	noise result;
 	result.average = getAvg(pixels);
 	result.variance = getVariance(result.average, pixels);
-	result.stdDev = getStdDev(result.variance);
+	result.stdDev = sqrt(result.variance);
 	result.sampleSize = sizeof(pixels);
 	return result;
 }
@@ -151,7 +151,7 @@ void calcNoiseCorners(image *imgData, config* cfg){
 	
 	// simple k.o.-system, highest mean looses
 	
-	int round1, round2, round3;
+	int round1 = 0, round2 = 0, round3 = 0;
 	// round #1: looser of 0 vs 1
 	if(corners[0] > corners[1]){
 		round1 = 0;
@@ -161,9 +161,9 @@ void calcNoiseCorners(image *imgData, config* cfg){
 	
 	// round #2: looser of 2 vs 3
 	if(corners[2] > corners[3]){
-		round1 = 2;
+		round2 = 2;
 	} else {
-		round1 = 3;
+		round2 = 3;
 	}
 	
 	// round #3: looser of round #1 vs looser of round #2

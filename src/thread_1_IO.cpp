@@ -17,7 +17,7 @@ void ioThread(config* cfg) {
 
 	for (; cfg->shutdownThread != 1; this_thread::sleep_for(chrono::milliseconds(10))) {
 
-		auto files = getFiles(cfg->srcPath, L".bmp");
+		auto files = getFiles(cfg->srcPath, ".bmp");
 
 		//TODO:
 		// - detect framerate and set config->framerate, refresh from time to time. a roug estimation has to be given as command line or config file parameter for the first average image.
