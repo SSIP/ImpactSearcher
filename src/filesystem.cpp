@@ -8,15 +8,15 @@
 	#include <unistd.h>
 #endif
 
-list<fileInf> getFiles(wstring dir, wstring extension) {
+list<fileInf> getFiles(tstring dir, tstring extension) {
 	// note: all FAT file systems will return files unsorted, so please do not use FAT!
 
 	list<fileInf> retval;
 
 #ifdef WIN32
 
-	// build search wstring (also accept trailing backslash in dir parameter)
-	wstring directory = L"\\\\?\\" + dir + (dir[dir.length() - 1] != L'\\' ? L"\\" : L"");
+	// build search tstring (also accept trailing backslash in dir parameter)
+	tstring directory = L"\\\\?\\" + dir + (dir[dir.length() - 1] != L'\\' ? L"\\" : L"");
 
 	WIN32_FIND_DATA ffd;
 	HANDLE hfind = nullptr;
@@ -46,8 +46,8 @@ list<fileInf> getFiles(wstring dir, wstring extension) {
 
 #else
 
-	// build search wstring (also accept trailing slash in dir parameter)
-	wstring directory = dir + (dir[dir.length() - 1] != L'/' ? L"/" : L"");
+	// build search tstring (also accept trailing slash in dir parameter)
+	tstring directory = dir + (dir[dir.length() - 1] != L'/' ? L"/" : L"");
 
 	DIR *dir;
 	dirent *file;
@@ -62,7 +62,7 @@ list<fileInf> getFiles(wstring dir, wstring extension) {
 			continue; // this quick and dirty but should suffice
 
 		// stat() the file
-		wstring fileName = directory + file->d_name;
+		tstring fileName = directory + file->d_name;
 		if (stat(fileName.c_str(), &st) == -1)
 			continue;
 

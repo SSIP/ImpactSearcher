@@ -14,8 +14,14 @@ using namespace std;
 
 #if defined _WIN32 || defined __CYGWIN__ || defined __MINGW32__
 #define SNPRINTF _snprintf
+#define WFOPEN _wfopen
+#define to_tstring to_wstring
+typedef wstring tstring;
 #else
 #define SNPRINTF snprintf
+#define WFOPEN fopen
+#define to_tstring to_string
+typedef wstring string;
 #endif
 
 enum enumKeepFrames {
@@ -74,7 +80,7 @@ struct image {
  * 
  *  Y axis
  */
-	wstring fileName;
+	tstring fileName;
 	uint8_t* rawBitmap;
 	int16_t* diffBitmap;
 	noise imgNoise;
@@ -104,7 +110,7 @@ struct averageImage {
 struct config {
 	// command line/config file arguments
 	// 01: IO thread
-	wstring srcPath, dstPath;			// input & output folder
+	tstring srcPath, dstPath;			// input & output folder
 	enumKeepFrames keepFrames;			// archive all, interesting or candidate frames
 	enumArchiveType archiveType;		// archive as bmp or png files (or not at all)
 	uint32_t imageResX, imageResY;		// image resolution in pixels

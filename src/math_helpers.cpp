@@ -45,7 +45,7 @@ coordinates massCenter(image* frame, config* cfg){
 	move.x = -(int32_t)((sumX / sumTotal) - cfg->imageResX / 2);
 	move.y = (sumY / sumTotal) - cfg->imageResY / 2;
 	if (cfg->verbosity >= 3)
-		fwprintf(stderr, (wstring(frame->fileName) + L": moveX=" + to_wstring(move.x) + L", moveY=" + to_wstring(move.y) + L"\n").c_str());
+		fwprintf(stderr, (tstring(frame->fileName) + L": moveX=" + to_tstring(move.x) + L", moveY=" + to_tstring(move.y) + L"\n").c_str());
 	return move;
 }
 
@@ -101,7 +101,7 @@ void calcNoiseCorners(image *imgData, config* cfg){
 	triLeg = (uint32_t)sqrt(2)*triHeight;
 	numPixels = (uint32_t)(0.5 * pow(2*triLeg,2));
 	uint32_t *pixels = new uint32_t[numPixels];
-	uint32_t y,counter;
+	uint32_t y, counter = 0;
 
 /*
  * image[x][y]
