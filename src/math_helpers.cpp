@@ -89,7 +89,8 @@ void calcNoiseCorners(image *imgData, config* cfg){
 	triHeight = sqrt(2*pow(maxDiameter,2));
 	triLeg = (uint32_t)sqrt(2)*triHeight;
 	numPixels = (uint32_t)(0.5 * pow(2*triLeg,2));
-	uint32_t *pixels = new uint32_t[4][numPixels];
+	uint32_t *pixels;
+	pixels = (uint32_t*) malloc (4*numPixels);
 	uint32_t y, counter = 0;
 
 /*
@@ -172,7 +173,8 @@ void calcNoiseCorners(image *imgData, config* cfg){
 	} else {
 		round3 = round2;
 	}
-	uint32_t *totalPixels = new uint32_t[3*numPixels];
+	uint32_t *totalPixels;
+	totalPixels = (uint32_t*) malloc (3*numPixels);
 	double sum = 0;
 	uint32_t m = 0;
 	for(uint32_t n = 0; n < 4; n++){
