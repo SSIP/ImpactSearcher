@@ -4,24 +4,26 @@
 	#define WIN32_LEAN_AND_MEAN
 	#include <Windows.h>
 #else
+	#include <sys/types.h>
+	#include <sys/stat.h>
 	#include <dirent.h>
 	#include <unistd.h>
 #endif
 
-list<fileInf> getFiles(wstring dir, wstring extension) {
+list<fileInf> getFiles(string _dir, string extension) {
 	// note: all FAT file systems will return files unsorted, so please do not use FAT!
 
 	list<fileInf> retval;
 
 #ifdef WIN32
 
-	// build search wstring (also accept trailing backslash in dir parameter)
-	wstring directory = L"\\\\?\\" + dir + (dir[dir.length() - 1] != L'\\' ? L"\\" : L"");
+	// build search string (also accept trailing backslash in dir parameter)
+	string directory = "\\\\?\\" + _dir + (_dir[_dir.length() - 1] != '\\' ? "\\" : "");
 
 	WIN32_FIND_DATA ffd;
 	HANDLE hfind = nullptr;
 
-	if ((hfind = FindFirstFile((directory + L"*").c_str(), &ffd)) == INVALID_HANDLE_VALUE)
+	if ((hfind = FindFirstFile((directory + "*").c_str(), &ffd)) == INVALID_HANDLE_VALUE)
 		return retval; // no files found
 
 	do {
@@ -30,9 +32,9 @@ list<fileInf> getFiles(wstring dir, wstring extension) {
 		}
 		else {
 			// this is a file, check its extension
-			wchar_t *pExtension = ffd.cFileName + wcslen(ffd.cFileName) - extension.length();
+			char *pExtension = ffd.cFileName + strlen(ffd.cFileName) - extension.length();
 
-			if (wcscmp(pExtension, extension.c_str()) == 0) {
+			if (strcmp(pExtension, extension.c_str()) == 0) {
 				// save full path and size
 				fileInf fi;
 				fi.name = directory + ffd.cFileName;
@@ -46,12 +48,12 @@ list<fileInf> getFiles(wstring dir, wstring extension) {
 
 #else
 
-	// build search wstring (also accept trailing slash in dir parameter)
-	wstring directory = dir + (dir[dir.length() - 1] != L'/' ? L"/" : L"");
+	// build search string (also accept trailing slash in dir parameter)
+	string directory = _dir + (_dir[_dir.length() - 1] != '/' ? "/" : "");
 
 	DIR *dir;
 	dirent *file;
-	stat st;
+	struct stat st;
 
 	if ((dir = opendir(directory.c_str())) == nullptr)
 		return retval;
@@ -62,7 +64,7 @@ list<fileInf> getFiles(wstring dir, wstring extension) {
 			continue; // this quick and dirty but should suffice
 
 		// stat() the file
-		wstring fileName = directory + file->d_name;
+		string fileName = directory + file->d_name;
 		if (stat(fileName.c_str(), &st) == -1)
 			continue;
 
@@ -71,9 +73,9 @@ list<fileInf> getFiles(wstring dir, wstring extension) {
 			continue;
 
 		// this is a file, check its extension
-		wchar_t *pExtension = file->d_name + wcslen(file->d_name) - extension.length();
+		char *pExtension = file->d_name + strlen(file->d_name) - extension.length();
 
-		if (wcscmp(pExtension, extension.c_str()) == 0) {
+		if (strcmp(pExtension, extension.c_str()) == 0) {
 			// save full path and size
 			fileInf fi;
 			fi.name = fileName;

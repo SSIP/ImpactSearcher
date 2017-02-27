@@ -77,7 +77,7 @@ struct image {
  * 
  *  Y axis
  */
-	wstring fileName;
+	string fileName;
 	uint8_t* rawBitmap;
 	int16_t* diffBitmap;
 	noise imgNoise;
@@ -107,7 +107,7 @@ struct averageImage {
 struct config {
 	// command line/config file arguments
 	// 01: IO thread
-	wstring srcPath, dstPath;			// input & output folder
+	string srcPath, dstPath;			// input & output folder
 	enumKeepFrames keepFrames;			// archive all, interesting or candidate frames
 	enumArchiveType archiveType;		// archive as bmp or png files (or not at all)
 	uint32_t imageResX, imageResY;		// image resolution in pixels
