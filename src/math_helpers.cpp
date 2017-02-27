@@ -88,8 +88,8 @@ void calcNoiseCorners(image *imgData, config* cfg){
 	}
 	triHeight = sqrt(2*pow(maxDiameter,2));
 	triLeg = (uint32_t)sqrt(2)*triHeight;
-	numPixels = 4*(uint32_t)(0.5 * pow(2*triLeg,2));
-	uint32_t *pixels = new uint32_t[numPixels];
+	numPixels = (uint32_t)(0.5 * pow(2*triLeg,2));
+	uint32_t *pixels = new uint32_t[4][numPixels];
 	uint32_t y, counter = 0;
 
 /*
@@ -117,7 +117,7 @@ void calcNoiseCorners(image *imgData, config* cfg){
 	// top left
 	for (uint32_t x = 0; x < triLeg; x++){
 		for (uint32_t y = 0; y <= triLeg - x; y++) {
-			pixels[counter] = imgData->rawBitmap[y * cfg->imageResX + x];
+			pixels[counter++] = imgData->rawBitmap[y * cfg->imageResX + x];
 		}
 	}
 	corners[0] = getAvg(pixels);
@@ -126,7 +126,7 @@ void calcNoiseCorners(image *imgData, config* cfg){
 	// bottom left
 	for (uint32_t x = 0; x < triLeg; x++) {
 		for (uint32_t y = cfg->imageResY - triLeg + x; y < cfg->imageResY ; y++) {
-			pixels[counter] = imgData->rawBitmap[y * cfg->imageResX + x];
+			pixels[counter++] = imgData->rawBitmap[y * cfg->imageResX + x];
 		}
 	}
 	corners[1] = getAvg(pixels);
@@ -135,7 +135,7 @@ void calcNoiseCorners(image *imgData, config* cfg){
 	// top right
 	for (uint32_t x = cfg->imageResX - triLeg; x < cfg->imageResX; x++) {
 		for (uint32_t y = 0; y < (x - cfg->imageResX + triLeg); y++) {
-			pixels[counter] = imgData->rawBitmap[y * cfg->imageResX + x];
+			pixels[counter++] = imgData->rawBitmap[y * cfg->imageResX + x];
 		}
 	}
 	corners[2] = getAvg(pixels);
@@ -144,7 +144,7 @@ void calcNoiseCorners(image *imgData, config* cfg){
 	// bottom right
 	for (uint32_t x = cfg->imageResX - triLeg; x < cfg->imageResX; x++) {
 		for (uint32_t y = cfg->imageResY - (x - cfg->imageResX + triLeg); y < cfg->imageResY; y++) {
-			pixels[counter] = imgData->rawBitmap[y * cfg->imageResX + x];
+			pixels[counter++] = imgData->rawBitmap[y * cfg->imageResX + x];
 		}
 	}
 	corners[4] = getAvg(pixels);
