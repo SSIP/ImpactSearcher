@@ -49,13 +49,13 @@ coordinates massCenter(image* frame, config* cfg){
 	return move;
 }
 
-double getAvg(uint32_t *pixels)
+double getAvg(uint32_t *pixels, uint32_t length)
 {
 	uint64_t sum = 0;
-	for(uint32_t x = 0; x < sizeof(pixels); x++){
+	for(uint32_t x = 0; x < length; x++){
 		sum += pixels[x];
 	}
-	return sum/sizeof(pixels);
+	return sum/length;
 }
 
 double getVariance(double mean, uint32_t *pixels)
@@ -70,7 +70,7 @@ double getVariance(double mean, uint32_t *pixels)
 
 noise calcNoise(uint32_t *pixels) {
 	noise result;
-	result.average = getAvg(pixels);
+	result.average = getAvg(pixels, sizeof(pixels));
 	result.variance = getVariance(result.average, pixels);
 	result.stdDev = sqrt(result.variance);
 	result.sampleSize = sizeof(pixels);
@@ -121,7 +121,7 @@ void calcNoiseCorners(image *imgData, config* cfg){
 			pixels[counter++] = imgData->rawBitmap[y * cfg->imageResX + x];
 		}
 	}
-	corners[0] = getAvg(pixels);
+	corners[0] = getAvg(pixels + 0 * numPixels, numPixels);
 	
 	counter = 0;
 	// bottom left
@@ -130,7 +130,7 @@ void calcNoiseCorners(image *imgData, config* cfg){
 			pixels[counter++] = imgData->rawBitmap[y * cfg->imageResX + x];
 		}
 	}
-	corners[1] = getAvg(pixels);
+	corners[1] = getAvg(pixels + 1 * numPixels, numPixels);
 	
 	counter = 0;
 	// top right
@@ -139,7 +139,7 @@ void calcNoiseCorners(image *imgData, config* cfg){
 			pixels[counter++] = imgData->rawBitmap[y * cfg->imageResX + x];
 		}
 	}
-	corners[2] = getAvg(pixels);
+	corners[2] = getAvg(pixels + 2 * numPixels, numPixels);
 	
 	counter = 0;
 	// bottom right
@@ -148,7 +148,7 @@ void calcNoiseCorners(image *imgData, config* cfg){
 			pixels[counter++] = imgData->rawBitmap[y * cfg->imageResX + x];
 		}
 	}
-	corners[4] = getAvg(pixels);
+	corners[4] = getAvg(pixels + 3 * numPixels, numPixels);
 	
 	// simple k.o.-system, highest mean looses
 	

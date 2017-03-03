@@ -8,6 +8,12 @@ struct circle {
 	double_t radius;
 };
 
+struct coordPlanet {
+	double rotPoleImage; // rotation of north pole in image plane
+	double poleInclination; // inclination of north pole towards observer
+	bool westIsLeft; // if west is on the right side of image (after rotation) -> mirrored
+};
+
 coordinates rayCenter(coordinates approximateCenter, image* frame, int32_t numberRays, config* cfg);
 coordinates massCenter(image* frame, config* cfg);
 
