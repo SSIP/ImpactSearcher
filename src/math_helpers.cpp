@@ -70,7 +70,7 @@ double getVariance(double mean, uint32_t *pixels)
 
 noise calcNoise(uint32_t *pixels) {
 	noise result;
-	result.average = getAvg(pixels);
+	result.average = getAvg(pixels, sizeof(pixels));
 	result.variance = getVariance(result.average, pixels);
 	result.stdDev = sqrt(result.variance);
 	result.sampleSize = sizeof(pixels);
