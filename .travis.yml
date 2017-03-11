@@ -1,4 +1,5 @@
 dist: xenial
+sudo: required
 before_install:
   - apt-get install -y libpthread-stubs0-dev  
 # Enable C++ support
