@@ -1,4 +1,4 @@
-dist: trusty
+dist: xenial
 # Enable C++ support
 language: cpp
 # Compiler selection
