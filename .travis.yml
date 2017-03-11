@@ -11,4 +11,4 @@ compiler:
 script:
 #  - mkdir build
 #  - cd build
-  - cmake src && make libImpactSearcher
+  - cmake src && make imse
