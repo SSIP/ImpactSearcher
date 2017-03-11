@@ -194,4 +194,4 @@ void calcNoiseCorners(image *imgData, config* cfg){
 	
 	delete[] totalPixels;
 	delete[] pixels;
-}	
+}
