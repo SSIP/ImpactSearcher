@@ -1,4 +1,6 @@
 dist: xenial
+before_install:
+  - apt-get install -y libpthread-stubs0-dev  
 # Enable C++ support
 language: cpp
 # Compiler selection
