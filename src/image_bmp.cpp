@@ -1,4 +1,5 @@
 #include "image_bmp.h"
+#include <iostream>
 
 // align memory to 16 bit for direct pointer access
 #pragma pack(push, 2)
@@ -15,14 +16,14 @@ struct bitmapFileHeader {
 // source: windows 8.1 driver kit WinGDI.h line 808
 struct bitmapInfoHeader {
 	uint32_t	biSize;
-	int32_t				biWidth;
-	int32_t				biHeight;
+	int32_t		biWidth;
+	int32_t		biHeight;
 	uint16_t	biPlanes;
 	uint16_t	biBitCount;
 	uint32_t	biCompression;
 	uint32_t	biSizeImage;
-	int32_t				biXPelsPerMeter;
-	int32_t				biYPelsPerMeter;
+	int32_t		biXPelsPerMeter;
+	int32_t		biYPelsPerMeter;
 	uint32_t	biClrUsed;
 	uint32_t	biClrImportant;
 };
@@ -55,7 +56,8 @@ uint8_t* bmp_read(const string fileName, const uint64_t fileSize, const uint32_t
 
 	// check if the image corresponds to our needs
 	// check "BM" magic bytes (little endian)
-	if (memcmp((char*) file_header->bfType, "MB", 2))
+	const uint16_t c = ('M' << 8) + 'B';
+	if(memcmp((uint8_t*) &file_header->bfType, (uint8_t*) &c, 2))
 		throw runtime_error(NULL);
 	// if sizes don't match, the file is corrupted
 	if (file_header->bfSize != fileSize)
