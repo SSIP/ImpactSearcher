@@ -1,6 +1,7 @@
 *.vcxproj.filters
 *.vcxproj
 *.sln
+.vscode
 tmp/
 
 # https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
