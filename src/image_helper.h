@@ -1,5 +1,5 @@
 #pragma once
-#include "definitions.h"
+#include "libimse.h"
 
 void initImageParameters(const uint32_t width, const uint32_t height);
 

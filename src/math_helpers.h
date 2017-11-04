@@ -1,4 +1,4 @@
-#include "definitions.h"
+#include "libimse.h"
 
 typedef uint8_t** imgSlice;
 

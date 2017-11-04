@@ -1,4 +1,4 @@
-#include "definitions.h"
+#include "libimse.h"
 #include "math_helpers.h"
 
 // fit jupiter to image

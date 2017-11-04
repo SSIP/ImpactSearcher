@@ -1,5 +1,5 @@
 #pragma once
-#include "definitions.h"
+#include "libimse.h"
 
 struct fileInf {
 	string name;

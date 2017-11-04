@@ -1,4 +1,4 @@
-#include "definitions.h"
+#include "libimse.h"
 
 void OneDToTwoD(int32_t i, coordinates* retXY, config* cfg) {
 	retXY->x = i % cfg->imageResX;

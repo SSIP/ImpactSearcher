@@ -1,4 +1,4 @@
-#include "definitions.h"
+#include "libimse.h"
 #include "image_helper.h"
 
 void moveImage(config* cfg, image* curImg, int32_t moveX, int32_t moveY) {

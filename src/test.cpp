@@ -1,7 +1,7 @@
 #include "test.h"
 #include <iostream>
 #include <stdlib.h>
-#include "definitions.h"
+#include "libimse.h"
 #include "image_helper.h"
 #include "math_helpers.h"
 #include "image_bmp.h"

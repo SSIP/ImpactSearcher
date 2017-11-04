@@ -1,4 +1,4 @@
-#include "definitions.h"
+#include "libimse.h"
 #include "image_helper.h"
 
 //#define SIMPLE_AVERAGE
