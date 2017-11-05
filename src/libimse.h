@@ -95,6 +95,7 @@ struct image {
  * 
  *  Y axis
  */
+    uint32_t frameNo;
 	string fileName;
 	uint8_t* rawBitmap;
 	int16_t* diffBitmap;
@@ -108,7 +109,7 @@ struct image {
 	uint32_t radiusPlanet;
 	direction anglePlanet;
 
-	image(uint32_t imageResX, uint32_t imageResY, uint8_t* inputData);
+	image(uint32_t imageResX, uint32_t imageResY, uint8_t* inputData, uint32_t frameNo);
 	~image();
 };
 
