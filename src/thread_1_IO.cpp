@@ -14,7 +14,7 @@ void initImageParameters(const uint32_t width, const uint32_t height) {
 void ioThread(config* cfg) {
 	g_cfg = cfg;
 	image* curImg;
-    uint32_t frameNo = 0;
+	uint32_t frameNo = 0;
 
 	for (; cfg->shutdownThread != 1; this_thread::sleep_for(chrono::milliseconds(10))) {
 
@@ -25,7 +25,7 @@ void ioThread(config* cfg) {
 
 		// work through all new files
 		for(auto it = files.begin(); it != files.end(); it++) {
-            frameNo++;
+			frameNo++;
 			// read the source bitmap
 			auto inputData = bmp_read(it->name, it->size, cfg->imageResX, cfg->imageResY);
 			

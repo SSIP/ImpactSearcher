@@ -15,18 +15,18 @@
 // set library export macros
 #if defined _WIN32 || defined __CYGWIN__ || defined __MINGW32__
 #ifdef BUILDING_LIB
-    #define LIB_PUBLIC __declspec(dllexport)
+	#define LIB_PUBLIC __declspec(dllexport)
 #else
-    #define LIB_PUBLIC __declspec(dllimport)
+	#define LIB_PUBLIC __declspec(dllimport)
 #endif
 #define LIB_LOCAL
 #else
 #if __GNUC__ >= 4
-    #define LIB_PUBLIC __attribute__ ((visibility ("default")))
-    #define LIB_LOCAL  __attribute__ ((visibility ("hidden")))
+	#define LIB_PUBLIC __attribute__ ((visibility ("default")))
+	#define LIB_LOCAL  __attribute__ ((visibility ("hidden")))
 #else
-    #define LIB_PUBLIC
-    #define LIB_LOCAL
+	#define LIB_PUBLIC
+	#define LIB_LOCAL
 #endif
 #endif
 
@@ -95,7 +95,7 @@ struct image {
  * 
  *  Y axis
  */
-    uint32_t frameNo;
+	uint32_t frameNo;
 	string fileName;
 	uint8_t* rawBitmap;
 	int16_t* diffBitmap;
