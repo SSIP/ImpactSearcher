@@ -5,6 +5,9 @@ void presortThread(config* cfg) {
 	image* curImg = NULL;
 
 	for (; cfg->shutdownThread != 4; this_thread::sleep_for(chrono::milliseconds(10))) {
+		// wait for the ui
+		cfg->mUiAverage.lock();
+		cfg->mUiAverage.unlock();
 		// get the next image from our queue
 		cfg->mPresort.lock();
 

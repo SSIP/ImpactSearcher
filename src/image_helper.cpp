@@ -25,7 +25,7 @@
 
 image::image(uint32_t imageResX, uint32_t imageResY, uint8_t* inputData, uint32_t frameNo) {
 	uint32_t size = imageResX*  imageResY;
-    this->frameNo = frameNo;
+	this->frameNo = frameNo;
 	this->rawBitmap = inputData;
 	this->diffBitmap = new int16_t[size];
 	memset(this->diffBitmap, 0, size);

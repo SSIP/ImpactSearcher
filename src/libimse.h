@@ -158,6 +158,11 @@ struct config {
 	// thread synchronization and data passing variables
 	queue<image*> qCenter, qAverage, qPresort, qCheck;
 	mutex mCenter, mAverage, mPresort, mCheck;
+
+	// the UI mutexes concern the follow up queue of the coresponding thread. For example, the GUI wants to display the already centered image.
+	// To make sure that it can get an image from the queue between centering and averaging, it will acquire the mUiCenter mutex and then get an
+	// image without popping it from the queue. During the time the mutex is held by the UI, the average thread is not allowed to remove an image.
+	mutex mUiCenter, mUiAverage, mUiPresort, mUiCheck;
 	uint32_t shutdownThread;
 };
 

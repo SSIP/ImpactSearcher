@@ -15,6 +15,9 @@ void averageThread(config* cfg) {
 	uint32_t len1 = 0, len2 = 0, len3 = 0; // length of leading average, frame buffer, trailing average
 
 	for (; cfg->shutdownThread != 3; this_thread::sleep_for(chrono::milliseconds(10))) {
+		// wait for the ui
+		cfg->mUiCenter.lock();
+		cfg->mUiCenter.unlock();
 		// get the next image from our queue
 		cfg->mAverage.lock();
 
