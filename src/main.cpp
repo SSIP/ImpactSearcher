@@ -4,11 +4,11 @@
 
 LIB_PUBLIC void impactSearcherStart(config *cfg) {
 	// spawn worker threads, then return to caller
-	thread(ioThread, cfg);
-	thread(centerThread, cfg);
-	thread(averageThread, cfg);
-	thread(presortThread, cfg);
-	thread(checkThread, cfg);
+	thread(ioThread, cfg).detach();
+	thread(centerThread, cfg).detach();
+	thread(averageThread, cfg).detach();
+	thread(presortThread, cfg).detach();
+	thread(checkThread, cfg).detach();
 }
 
 LIB_PUBLIC void impactSearcherStop(config *cfg) {
