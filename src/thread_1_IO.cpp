@@ -1,6 +1,7 @@
 #include "libimse.h"
 #include "image_bmp.h"
 #include "filesystem.h"
+#include <sstream>
 
 static config* g_cfg;
 
@@ -26,6 +27,11 @@ void ioThread(config* cfg) {
 		// work through all new files
 		for(auto it = files.begin(); it != files.end(); it++) {
 			frameNo++;
+			stringstream ss;
+			ss << "Found " << it->name << ".\n";
+			cfg->mMessages.lock();
+			cfg->qMessages.push(ss.str());
+			cfg->mMessages.unlock();
 			// read the source bitmap
 			auto inputData = bmp_read(it->name, it->size, cfg->imageResX, cfg->imageResY);
 			
