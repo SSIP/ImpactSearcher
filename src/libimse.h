@@ -169,6 +169,11 @@ struct config {
 	mutex mMessages;
 
 	uint32_t shutdownThread;
+
+	// ratio of planet size to image width or height, whichever is smaller
+	double maxDiameter;
+	// Length of triangle leg in corners
+	uint32_t cornerTriLeg, numCornerPixels;
 };
 
 void ioThread(config* cfg);

@@ -27,11 +27,14 @@ void ioThread(config* cfg) {
 		// work through all new files
 		for(auto it = files.begin(); it != files.end(); it++) {
 			frameNo++;
-			stringstream ss;
-			ss << "Found " << it->name;
-			cfg->mMessages.lock();
-			cfg->qMessages.push(ss.str());
-			cfg->mMessages.unlock();
+			if (cfg->verbosity >= 2)
+			{
+				stringstream ss;
+				ss << "Found " << it->name;
+				cfg->mMessages.lock();
+				cfg->qMessages.push(ss.str());
+				cfg->mMessages.unlock();
+			}
 			// read the source bitmap
 			auto inputData = bmp_read(it->name, it->size, cfg->imageResX, cfg->imageResY);
 			

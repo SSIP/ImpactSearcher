@@ -37,6 +37,9 @@ coordinates *findBorder(uint32_t center, imgSlice slice);
 // total background
 void calcNoiseCorners(image *imgData, config *cfg);
 
+// calculate properties of background triangles in corners
+void calcCornerSize(config *cfg);
+
 // calc noise from array of pixel values
 noise calcNoise(uint32_t *pixels);
 

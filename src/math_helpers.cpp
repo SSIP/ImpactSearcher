@@ -1,6 +1,6 @@
 #include "math_helpers.h"
 #include <algorithm>
-#include <iostream>
+#include <sstream>
 
 coordinates rayCenter(coordinates approximateCenter, image* frame, int32_t numberRays, config* cfg){
 	int32_t i;
@@ -54,7 +54,6 @@ coordinates massCenter(image* frame, config* cfg){
 double getAvg(uint8_t *pixels, uint32_t length)
 {
 	uint64_t sum = 0;
-	cout << sizeof(pixels) << " " << length << endl;
 	for(uint32_t x = 0; x < length; x++){
 		sum += pixels[x];
 	}
@@ -80,22 +79,31 @@ noise calcNoise(uint8_t *pixels) {
 	return result;
 }
 
-void calcNoiseCorners(image *imgData, config* cfg){
-	uint32_t maxDiameter, triHeight, triLeg, numCornerPixels;
-	maxDiameter = (uint32_t)(cfg->imageResY * 0.4);
+void calcCornerSize(config *cfg){
+	uint32_t triHeight, maxDiameterPx;
+	maxDiameterPx = (uint32_t)(cfg->imageResY * cfg->maxDiameter);
+	triHeight = sqrt(2*pow(maxDiameterPx,2))/2;
 
-
-	triHeight = sqrt(2*pow(maxDiameter,2))/2;
-	cout << "triHeight " << triHeight << endl;
-	triLeg = (uint32_t)sqrt(2)*triHeight;
-	numCornerPixels = 0;
-	for(uint32_t n = 0; n <= triLeg; n++)
+	if (cfg->verbosity >= 3)
 	{
-		numCornerPixels = numCornerPixels + n;
+		stringstream ss;
+		ss << "Triangle height: " << triHeight;
+		cfg->mMessages.lock();
+		cfg->qMessages.push(ss.str());
+		cfg->mMessages.unlock();
 	}
-	cout << numCornerPixels << endl;
+	cfg->cornerTriLeg = (uint32_t)sqrt(2)*triHeight;
+	cfg->numCornerPixels = 0;
+	for(uint32_t n = 0; n <= cfg->cornerTriLeg; n++)
+	{
+		cfg->numCornerPixels = cfg->numCornerPixels + n;
+	}
+}
+
+void calcNoiseCorners(image *imgData, config* cfg){
+
 	uint8_t *pixels;
-	pixels = (uint8_t*) malloc (4*numCornerPixels);
+	pixels = (uint8_t*) malloc (4*cfg->numCornerPixels);
 	uint32_t y, counter = 0;
 
 /*
@@ -121,39 +129,39 @@ void calcNoiseCorners(image *imgData, config* cfg){
 
 	double corners[4];
 	// top left
-	for (uint32_t x = 0; x < triLeg; x++){
-		for (uint32_t y = 0; y <= triLeg - x; y++) {
+	for (uint32_t x = 0; x < cfg->cornerTriLeg; x++){
+		for (uint32_t y = 0; y <= cfg->cornerTriLeg - x; y++) {
 			pixels[counter++] = imgData->rawBitmap[y * cfg->imageResX + x];
 		}
 	}
-	corners[0] = getAvg(pixels + 0 * numCornerPixels, counter);
+	corners[0] = getAvg(pixels + 0 * cfg->numCornerPixels, counter);
 	
 	counter = 0;
 	// bottom left
-	for (uint32_t x = 0; x < triLeg; x++) {
-		for (uint32_t y = cfg->imageResY - triLeg + x; y < cfg->imageResY ; y++) {
+	for (uint32_t x = 0; x < cfg->cornerTriLeg; x++) {
+		for (uint32_t y = cfg->imageResY - cfg->cornerTriLeg + x; y < cfg->imageResY ; y++) {
 			pixels[counter++] = imgData->rawBitmap[y * cfg->imageResX + x];
 		}
 	}
-	corners[1] = getAvg(pixels + 1 * numCornerPixels, counter);
+	corners[1] = getAvg(pixels + 1 * cfg->numCornerPixels, counter);
 	
 	counter = 0;
 	// top right
-	for (uint32_t x = cfg->imageResX - triLeg; x < cfg->imageResX; x++) {
-		for (uint32_t y = 0; y < (x - cfg->imageResX + triLeg); y++) {
+	for (uint32_t x = cfg->imageResX - cfg->cornerTriLeg; x < cfg->imageResX; x++) {
+		for (uint32_t y = 0; y < (x - cfg->imageResX + cfg->cornerTriLeg); y++) {
 			pixels[counter++] = imgData->rawBitmap[y * cfg->imageResX + x];
 		}
 	}
-	corners[2] = getAvg(pixels + (uint32_t)(2 * numCornerPixels), counter);
+	corners[2] = getAvg(pixels + (uint32_t)(2 * cfg->numCornerPixels), counter);
 	
 	counter = 0;
 	// bottom right
-	for (uint32_t x = cfg->imageResX - triLeg; x < cfg->imageResX; x++) {
-		for (uint32_t y = cfg->imageResY - (x - cfg->imageResX + triLeg); y < cfg->imageResY; y++) {
+	for (uint32_t x = cfg->imageResX - cfg->cornerTriLeg; x < cfg->imageResX; x++) {
+		for (uint32_t y = cfg->imageResY - (x - cfg->imageResX + cfg->cornerTriLeg); y < cfg->imageResY; y++) {
 			pixels[counter++] = imgData->rawBitmap[y * cfg->imageResX + x];
 		}
 	}
-	corners[3] = getAvg(pixels + 3 * numCornerPixels, counter);
+	corners[3] = getAvg(pixels + 3 * cfg->numCornerPixels, counter);
 	
 	// simple k.o.-system, highest mean looses
 	
@@ -179,7 +187,7 @@ void calcNoiseCorners(image *imgData, config* cfg){
 		round3 = round2;
 	}
 	uint8_t *totalPixels;
-	totalPixels = (uint8_t*) malloc (3*numCornerPixels);
+	totalPixels = (uint8_t*) malloc (3*cfg->numCornerPixels);
 	double sum = 0;
 	uint32_t m = 0;
 	for(uint32_t n = 0; n < 4; n++){
@@ -187,8 +195,8 @@ void calcNoiseCorners(image *imgData, config* cfg){
 			
 		} else {
 			sum = sum + corners[n];
-			for(uint32_t x = 0; x < numCornerPixels; x++){
-				totalPixels[m * numCornerPixels + x] = pixels[n * numCornerPixels + x];
+			for(uint32_t x = 0; x < cfg->numCornerPixels; x++){
+				totalPixels[m * cfg->numCornerPixels + x] = pixels[n * cfg->numCornerPixels + x];
 			}
 			m++;
 		}

@@ -1,6 +1,8 @@
 #include "libimse.h"
 #include "image_helper.h"
+#include "math_helpers.h"
 #include <sstream>
+#include <iostream>
 
 void moveImage(config* cfg, image* curImg, int32_t moveX, int32_t moveY) {
 	// crop centered image
@@ -34,7 +36,7 @@ void centerThread(config* cfg) {
 	bool queueEmpty;
 	bool firstAvg = false;
 	int32_t firstAvgCount = 0;
-
+	calcCornerSize(cfg);
 	for (; cfg->shutdownThread != 2; this_thread::sleep_for(chrono::milliseconds(10))) {
 		// get the next image from our queue
 		cfg->mCenter.lock();
@@ -49,11 +51,7 @@ void centerThread(config* cfg) {
 			cfg->statQlen2--;
 			cfg->mCenter.unlock();
 		}
-		stringstream ss;
-		ss << "Centering frame " << curImg->frameNo << ".\n";
-		cfg->mMessages.lock();
-		cfg->qMessages.push(ss.str());
-		cfg->mMessages.unlock();
+
 		// curImg now contains the current image ready for centering
 		// remark: hotpixel recognition was decided to be not needed because of the minimal impact it has after centering and averaging
 
@@ -63,19 +61,28 @@ void centerThread(config* cfg) {
 
 		approxCenter.x = (cfg->imageResX / 2) + moveCenter.x;
 		approxCenter.x = (cfg->imageResY / 2) + moveCenter.y;
+		if (cfg->verbosity >= 3)
+		{
+			stringstream ss;
+			ss << "Centering frame: " << curImg->frameNo << " - move (x,y): (" << moveCenter.x << "," << moveCenter.y << ")";
+			cfg->mMessages.lock();
+			cfg->qMessages.push(ss.str());
+			cfg->mMessages.unlock();
+		}
+		//calcNoiseCorners(curImg, cfg);
 
 		//refine center with ray logic
-		moveCenter = rayCenter(approxCenter, curImg, 8, cfg);
+		//moveCenter = rayCenter(approxCenter, curImg, 8, cfg);
 
 		// crop image
 		moveImage(cfg, curImg, moveCenter.x, moveCenter.y);
 
-		firstAvgCount++;
+		/*firstAvgCount++;
 		if (firstAvgCount >= cfg->averageLength)
 		{
 			//calculate exact center of jupiter and ellipse parameters
 			firstAvg = true;
-		}
+		}*/
 
 		/* todo: ray centering algorithm
 		//- center of mass only until the first average image is finished
