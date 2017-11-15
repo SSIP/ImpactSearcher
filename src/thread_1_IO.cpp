@@ -28,7 +28,7 @@ void ioThread(config* cfg) {
 		for(auto it = files.begin(); it != files.end(); it++) {
 			frameNo++;
 			stringstream ss;
-			ss << "Found " << it->name << ".\n";
+			ss << "Found " << it->name;
 			cfg->mMessages.lock();
 			cfg->qMessages.push(ss.str());
 			cfg->mMessages.unlock();

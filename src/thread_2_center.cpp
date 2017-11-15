@@ -1,5 +1,6 @@
 #include "libimse.h"
 #include "image_helper.h"
+#include <sstream>
 
 void moveImage(config* cfg, image* curImg, int32_t moveX, int32_t moveY) {
 	// crop centered image
@@ -48,14 +49,18 @@ void centerThread(config* cfg) {
 			cfg->statQlen2--;
 			cfg->mCenter.unlock();
 		}
-
+		stringstream ss;
+		ss << "Centering frame " << curImg->frameNo << ".\n";
+		cfg->mMessages.lock();
+		cfg->qMessages.push(ss.str());
+		cfg->mMessages.unlock();
 		// curImg now contains the current image ready for centering
 		// remark: hotpixel recognition was decided to be not needed because of the minimal impact it has after centering and averaging
 
 		coordinates moveCenter, approxCenter;
 		// rough center estimation with center of mass logic
 		moveCenter = massCenter(curImg, cfg);
-		
+
 		approxCenter.x = (cfg->imageResX / 2) + moveCenter.x;
 		approxCenter.x = (cfg->imageResY / 2) + moveCenter.y;
 
