@@ -60,6 +60,10 @@ struct coordinates {
 	uint32_t x, y;
 };
 
+struct deltacoords {
+	int32_t x, y;
+};
+
 struct direction {
 	double_t x, y;
 };
@@ -181,8 +185,6 @@ void centerThread(config* cfg);
 void averageThread(config* cfg);
 void presortThread(config* cfg);
 void checkThread(config* cfg);
-coordinates massCenter(image* frame, config* cfg);
-coordinates rayCenter(coordinates approximateCenter, image* frame, int32_t numberRays, config* cfg);
 
 LIB_PUBLIC void impactSearcherStart(config *cfg);
 LIB_PUBLIC void impactSearcherStop(config *cfg);

@@ -1,8 +1,9 @@
 #include "math_helpers.h"
 #include <algorithm>
+#include <iostream>
 #include <sstream>
 
-coordinates rayCenter(coordinates approximateCenter, image* frame, int32_t numberRays, config* cfg){
+deltacoords rayCenter(coordinates approximateCenter, image* frame, int32_t numberRays, config* cfg){
 	int32_t i;
 	float rayAngle = M_PI / numberRays;
 
@@ -26,12 +27,12 @@ coordinates rayCenter(coordinates approximateCenter, image* frame, int32_t numbe
 			radius++;
 		}
 	}
-	return coordinates{ 0, 0 };
+	return deltacoords{ 0, 0 };
 }
 
-coordinates massCenter(image* frame, config* cfg){
+deltacoords massCenter(image* frame, config* cfg){
 	uint32_t sumX = 0, sumY = 0, sumTotal = 0, x, y, pixel;
-	coordinates move;
+	deltacoords move;
 
 	for (uint32_t y = 0; y < cfg->imageResY; y += cfg->centerSkipPixels){ // loop y axis
 		for (x = 0; x < cfg->imageResX; x += cfg->centerSkipPixels){ // loop x axis
@@ -43,10 +44,14 @@ coordinates massCenter(image* frame, config* cfg){
 			}
 		}
 	}
-	move.x = -(int32_t)((sumX / sumTotal) - cfg->imageResX / 2);
+	coordinates centerOfMass, center;
+	centerOfMass.x = (sumX / sumTotal);
+	centerOfMass.y = (sumY / sumTotal);
+	center.x = cfg->imageResX / 2;
+	center.y = cfg->imageResY / 2;
+	cout << "comX " << centerOfMass.x << " comY " << centerOfMass.y << " center x " << center.x << " center y " << center.y << endl;
+	move.x = ((sumX / sumTotal) - cfg->imageResX / 2);
 	move.y = (sumY / sumTotal) - cfg->imageResY / 2;
-	if (cfg->verbosity >= 3)
-		fprintf(stderr, (string(frame->fileName) + ": moveX=" + to_string(move.x) + ", moveY=" + to_string(move.y) + "\n").c_str());
 	return move;
 }
 

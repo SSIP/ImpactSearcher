@@ -14,8 +14,8 @@ struct coordPlanet {
 	bool westIsLeft; // if west is on the right side of image (after rotation) -> mirrored
 };
 
-coordinates rayCenter(coordinates approximateCenter, image* frame, int32_t numberRays, config* cfg);
-coordinates massCenter(image* frame, config* cfg);
+deltacoords rayCenter(coordinates approximateCenter, image* frame, int32_t numberRays, config* cfg);
+deltacoords massCenter(image* frame, config* cfg);
 
 // fit a circle to a list of coordinates with least squares
 circle fitCircle(coordinates *borderPoints);

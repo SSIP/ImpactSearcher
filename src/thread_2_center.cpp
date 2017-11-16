@@ -6,6 +6,7 @@
 
 void moveImage(config* cfg, image* curImg, int32_t moveX, int32_t moveY) {
 	// crop centered image
+	cout << "move x " << moveX << " move y " << moveY << endl;
 	// postive values of moveY indicate that the center of the image should be moved up, negative values indicate moving down
 	if (moveY < 0) {
 		memmove(curImg->rawBitmap + -moveY*  cfg->imageResX, curImg->rawBitmap, cfg->imageResX*  (cfg->imageResY + moveY));
@@ -55,7 +56,8 @@ void centerThread(config* cfg) {
 		// curImg now contains the current image ready for centering
 		// remark: hotpixel recognition was decided to be not needed because of the minimal impact it has after centering and averaging
 
-		coordinates moveCenter, approxCenter;
+		deltacoords moveCenter;
+		coordinates approxCenter;
 		// rough center estimation with center of mass logic
 		moveCenter = massCenter(curImg, cfg);
 
