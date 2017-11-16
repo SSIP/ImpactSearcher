@@ -3,7 +3,17 @@
 #include "filesystem.h"
 #include <sstream>
 
+static config* g_cfg;
+
+void initImageParameters(const uint32_t width, const uint32_t height) {
+	g_cfg->imageResX = width;
+	g_cfg->imageResY = height;
+	g_cfg->leadingAverage = new averageImage(width, height, g_cfg->leadingAverageLength);
+	g_cfg->trailingAverage = new averageImage(width, height, g_cfg->trailingAverageLength);
+}
+
 void ioThread(config* cfg) {
+	g_cfg = cfg;
 	image* curImg;
 	uint32_t frameNo = 0;
 

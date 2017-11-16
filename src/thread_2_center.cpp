@@ -101,6 +101,7 @@ void centerThread(config* cfg) {
 
 		// send the image to the next thread
 		cfg->mAverage.lock();
+		cout << "not empty anymore" << endl;
 		cfg->qAverage.push(curImg);
 		cfg->statQlen3++;
 		cfg->mAverage.unlock();
