@@ -49,8 +49,8 @@ deltacoords massCenter(image* frame, config* cfg){
 	centerOfMass.y = (sumY / sumTotal);
 	center.x = cfg->imageResX / 2;
 	center.y = cfg->imageResY / 2;
-	cout << "comX " << centerOfMass.x << " comY " << centerOfMass.y << " center x " << center.x << " center y " << center.y << endl;
-	move.x = ((sumX / sumTotal) - cfg->imageResX / 2);
+	// invert x value because of definition for moveImage function
+	move.x = -((sumX / sumTotal) - cfg->imageResX / 2);
 	move.y = (sumY / sumTotal) - cfg->imageResY / 2;
 	return move;
 }
