@@ -1,5 +1,6 @@
 #include "libimse.h"
 #include "image_helper.h"
+#include <iostream>
 
 // todo: do we need the average image outside of this thread -> no
 
@@ -12,6 +13,9 @@ void averageThread(config* cfg) {
 	image* curImg = NULL;
 	queue<image*> qBuf1, qBuf2, qBuf3;
 	uint32_t len1 = 0, len2 = 0, len3 = 0; // length of leading average, frame buffer, trailing average
+
+	cfg->leadingAverage = new averageImage(cfg->imageResX, cfg->imageResY, cfg->leadingAverageLength);
+	cfg->trailingAverage = new averageImage(cfg->imageResX, cfg->imageResY, cfg->trailingAverageLength);
 
 	for (; cfg->shutdownThread != 3; this_thread::sleep_for(chrono::milliseconds(10))) {
 		// wait for the ui
@@ -111,6 +115,8 @@ averageImage::averageImage(uint32_t imageResX, uint32_t imageResY, uint32_t leng
 
 // todo: remove code for semi full buffers because now we wait until they are full until we use the data
 void averageImage::shuffle(uint8_t* rawBitmapInput) {
+	cout << this->summandsPos << endl;
+	cout << this->summandsPosOld << endl;
 	uint8_t* newImage = this->summands[this->summandsPos],* oldImage = this->summands[this->summandsPosOld];
 	// copy new image into local storage
 	memcpy(newImage, rawBitmapInput, this->imageSize);

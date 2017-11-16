@@ -154,7 +154,6 @@ struct config {
 	float rayBrightnessThreshold;		// = 0.3 limb darkening threshold 
 
 	// data storage
-	averageImage* frameAverage;	// average image structure
 	averageImage* leadingAverage,* trailingAverage;
 	// statistic counters
 	uint32_t statFramesIO, statQlen2, statQlen3, statQlen4, statQlen5, statInteresting, statCandidates;
