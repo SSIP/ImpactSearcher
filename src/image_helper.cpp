@@ -174,8 +174,8 @@ void tarFile::setHeader(char* fileName, unsigned long long fileSize, unsigned lo
 	memset(this->header.name, 0, sizeof this->header.name);
 
 	strcpy((char*) this->header.name, (const char*)fileName);
-	SNPRINTF((char*) this->header.size, 11, "%11I64o", fileSize);
-	SNPRINTF((char*) this->header.mtime, 11, "%11I64o", fileTime);
+	SNPRINTF((char*) this->header.size, 11, "%11llo", fileSize);
+	SNPRINTF((char*) this->header.mtime, 11, "%11llo", fileTime);
 	memcpy(this->header.checksum, "        ", 8);
 
 	// compute and set checksum
