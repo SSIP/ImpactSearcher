@@ -5,7 +5,7 @@
 
 deltacoords rayCenter(coordinates approximateCenter, image* frame, int32_t numberRays, config* cfg){
 	int32_t i;
-	float rayAngle = M_PI / numberRays;
+	float rayAngle = (float)M_PI / numberRays;
 
 	//turn axes of coordinates i times by rayAngle
 	for (i = 1; i < numberRays; i++){
@@ -31,7 +31,7 @@ deltacoords rayCenter(coordinates approximateCenter, image* frame, int32_t numbe
 }
 
 deltacoords massCenter(image* frame, config* cfg){
-	uint32_t sumX = 0, sumY = 0, sumTotal = 0, x, y, pixel;
+	uint32_t sumX = 0, sumY = 0, sumTotal = 0, x, pixel;
 	deltacoords move;
 
 	for (uint32_t y = 0; y < cfg->imageResY; y += cfg->centerSkipPixels){ // loop y axis
@@ -50,7 +50,7 @@ deltacoords massCenter(image* frame, config* cfg){
 	center.x = cfg->imageResX / 2;
 	center.y = cfg->imageResY / 2;
 	// invert x value because of definition for moveImage function
-	move.x = -((sumX / sumTotal) - cfg->imageResX / 2);
+	move.x = -(int32_t)((sumX / sumTotal) - cfg->imageResX / 2);
 	move.y = (sumY / sumTotal) - cfg->imageResY / 2;
 	return move;
 }
@@ -62,7 +62,7 @@ double getAvg(uint8_t *pixels, uint32_t length)
 	for(uint32_t x = 0; x < length; x++){
 		sum += pixels[x];
 	}
-	return sum/length;
+	return (double)sum/length;
 }
 
 double getVariance(double mean, uint8_t *pixels)
@@ -87,7 +87,7 @@ noise calcNoise(uint8_t *pixels) {
 void calcCornerSize(config *cfg){
 	uint32_t triHeight, maxDiameterPx;
 	maxDiameterPx = (uint32_t)(cfg->imageResY * cfg->maxDiameter);
-	triHeight = sqrt(2*pow(maxDiameterPx,2))/2;
+	triHeight = (uint32_t)sqrt(2*pow(maxDiameterPx,2))/2;
 
 	if (cfg->verbosity >= 3)
 	{
@@ -109,7 +109,7 @@ void calcNoiseCorners(image *imgData, config* cfg){
 
 	uint8_t *pixels;
 	pixels = (uint8_t*) malloc (4*cfg->numCornerPixels);
-	uint32_t y, counter = 0;
+	uint32_t counter = 0;
 
 /*
  * image[x][y]
