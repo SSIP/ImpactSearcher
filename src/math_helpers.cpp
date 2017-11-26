@@ -137,36 +137,56 @@ void calcNoiseCorners(image *imgData, config* cfg){
 	for (uint32_t x = 0; x < cfg->cornerTriLeg; x++){
 		for (uint32_t y = 0; y <= cfg->cornerTriLeg - x; y++) {
 			pixels[counter++] = imgData->rawBitmap[y * cfg->imageResX + x];
+			if (cfg->verbosity >= 3)
+			{
+				imgData->rawBitmap[y * cfg->imageResX + x] = 100;
+			}
 		}
 	}
-	corners[0] = getAvg(pixels + 0 * cfg->numCornerPixels, counter);
+	corners[0] = getAvg(pixels + 0 * cfg->numCornerPixels, cfg->numCornerPixels);
+	cout << "avg c0 " << corners[0] << endl;
 	
-	counter = 0;
+	counter = cfg->numCornerPixels;
 	// bottom left
 	for (uint32_t x = 0; x < cfg->cornerTriLeg; x++) {
 		for (uint32_t y = cfg->imageResY - cfg->cornerTriLeg + x; y < cfg->imageResY ; y++) {
 			pixels[counter++] = imgData->rawBitmap[y * cfg->imageResX + x];
+			if (cfg->verbosity >= 3)
+			{
+				imgData->rawBitmap[y * cfg->imageResX + x] = 150;
+			}
 		}
 	}
-	corners[1] = getAvg(pixels + 1 * cfg->numCornerPixels, counter);
+	corners[1] = getAvg(pixels + 1 * cfg->numCornerPixels, cfg->numCornerPixels);
+	cout << "avg c1 " << corners[1] << endl;
 	
-	counter = 0;
+	counter = 2*cfg->numCornerPixels;
 	// top right
 	for (uint32_t x = cfg->imageResX - cfg->cornerTriLeg; x < cfg->imageResX; x++) {
 		for (uint32_t y = 0; y < (x - cfg->imageResX + cfg->cornerTriLeg); y++) {
 			pixels[counter++] = imgData->rawBitmap[y * cfg->imageResX + x];
+			if (cfg->verbosity >= 3)
+			{
+				imgData->rawBitmap[y * cfg->imageResX + x] = 200;
+			}
 		}
 	}
-	corners[2] = getAvg(pixels + (uint32_t)(2 * cfg->numCornerPixels), counter);
+	corners[2] = getAvg(pixels + (uint32_t)(2 * cfg->numCornerPixels), cfg->numCornerPixels);
+	cout << "avg c2 " << corners[2] << endl;
 	
-	counter = 0;
+	counter = 3*cfg->numCornerPixels;
 	// bottom right
 	for (uint32_t x = cfg->imageResX - cfg->cornerTriLeg; x < cfg->imageResX; x++) {
 		for (uint32_t y = cfg->imageResY - (x - cfg->imageResX + cfg->cornerTriLeg); y < cfg->imageResY; y++) {
 			pixels[counter++] = imgData->rawBitmap[y * cfg->imageResX + x];
+			if (cfg->verbosity >= 3)
+			{
+				imgData->rawBitmap[y * cfg->imageResX + x] = 250;
+			}
 		}
 	}
-	corners[3] = getAvg(pixels + 3 * cfg->numCornerPixels, counter);
+	corners[3] = getAvg(pixels + 3 * cfg->numCornerPixels, cfg->numCornerPixels);
+	cout << "avg c3 " << corners[3] << endl;
 	
 	// simple k.o.-system, highest mean looses
 	

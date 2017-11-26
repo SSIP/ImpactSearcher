@@ -68,7 +68,7 @@ void centerThread(config* cfg) {
 			cfg->qMessages.push(ss.str());
 			cfg->mMessages.unlock();
 		}
-		//calcNoiseCorners(curImg, cfg);
+		calcNoiseCorners(curImg, cfg);
 
 		//refine center with ray logic
 		//moveCenter = rayCenter(approxCenter, curImg, 8, cfg);
