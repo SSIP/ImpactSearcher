@@ -34,7 +34,6 @@ void moveImage(config* cfg, image* curImg, int32_t moveX, int32_t moveY) {
 
 void centerThread(config* cfg) {
 	image* curImg = NULL;
-	bool queueEmpty;
 	bool firstAvg = false;
 	int32_t firstAvgCount = 0;
 	calcCornerSize(cfg);

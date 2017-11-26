@@ -2,7 +2,7 @@
 
 void OneDToTwoD(int32_t i, coordinates* retXY, config* cfg) {
 	retXY->x = i % cfg->imageResX;
-	retXY->y = floor(i / cfg->imageResX);
+	retXY->y = (uint32_t)floor(i / cfg->imageResX);
 }
 
 int32_t TowDtoOneD(int32_t x, int32_t y, config* cfg)
@@ -44,7 +44,7 @@ void checkThread(config* cfg) {
 			for (uint32_t i = 0; i < (cfg->imageResX*  cfg->imageResY); i++) {
 				if (curImpact.maxVal < curImg->diffBitmap[i] && flagedPixels[i] == 0 && curImg->diffBitmap[i] >= curImg->interestingStartValue) {
 					curImpact.center.x = i % cfg->imageResX;
-					curImpact.center.y = floor(i / cfg->imageResX);
+					curImpact.center.y = (uint32_t)floor(i / cfg->imageResX);
 					curImpact.maxVal = curImg->diffBitmap[i];
 					foundNewROI = 1;
 					flagedPixels[i] = 1;

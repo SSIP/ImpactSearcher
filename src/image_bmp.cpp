@@ -39,8 +39,8 @@ uint8_t* bmp_read(const string fileName, const uint64_t fileSize, const uint32_t
 		throw runtime_error(NULL);
 
 	// allocate memory for the whole file and read it
-	uint8_t* rawBuffer = new uint8_t[fileSize];
-	if (fread(rawBuffer, 1, fileSize, fIn) != fileSize)
+	uint8_t* rawBuffer = new uint8_t[(uint32_t)fileSize];
+	if (fread(rawBuffer, 1, (uint32_t)fileSize, fIn) != fileSize)
 		throw runtime_error(NULL);
 
 	// close the file

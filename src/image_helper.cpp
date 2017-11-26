@@ -174,8 +174,8 @@ void tarFile::setHeader(char* fileName, unsigned long long fileSize, unsigned lo
 	memset(this->header.name, 0, sizeof this->header.name);
 
 	strcpy((char*) this->header.name, (const char*)fileName);
-	SNPRINTF((char*) this->header.size, 11, "%11o", fileSize);
-	SNPRINTF((char*) this->header.mtime, 11, "%11o", fileTime);
+	SNPRINTF((char*) this->header.size, 11, "%11llo", fileSize);
+	SNPRINTF((char*) this->header.mtime, 11, "%11llo", fileTime);
 	memcpy(this->header.checksum, "        ", 8);
 
 	// compute and set checksum
@@ -193,7 +193,7 @@ void tarFile::addFileFromMem(char* fileName, unsigned long long fileSize, unsign
 
 		// append the header data, file data and padding bytes to the archive
 		fwrite(this->header.rawHeader, 1, 512, this->fOut);
-		fwrite(fileData, 1, fileSize, this->fOut);
+		fwrite(fileData, 1, (uint32_t)fileSize, this->fOut);
 		fwrite(this->padding, 1, 512 - (fileSize % 512), this->fOut);
 	}
 }
