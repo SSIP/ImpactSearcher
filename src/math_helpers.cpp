@@ -1,6 +1,5 @@
 #include "math_helpers.h"
 #include <algorithm>
-#include <iostream>
 #include <sstream>
 
 deltacoords rayCenter(coordinates approximateCenter, image* frame, int32_t numberRays, config* cfg){
@@ -132,7 +131,6 @@ void calcNoiseCorners(image *imgData, config* cfg){
  *  Y axis
  */
 
-	cout << "length pixels: 4x " << cfg->numCornerPixels << endl;
 	double corners[4];
 	uint32_t minX = 0, maxX = 0, minY = 0, maxY = 0, counter_start = 0;
 	// top left
@@ -150,7 +148,6 @@ void calcNoiseCorners(image *imgData, config* cfg){
 		}
 		maxY--;
 	}
-	cout << "avg c0 num pixels " << counter - counter_start << endl;
 	corners[0] = getAvg(pixels + 0 * cfg->numCornerPixels, cfg->numCornerPixels);
 	
 	counter_start = counter;
@@ -170,7 +167,6 @@ void calcNoiseCorners(image *imgData, config* cfg){
 			}
 		}
 	}
-	cout << "avg c0 num pixels " << counter - counter_start << endl;
 	corners[1] = getAvg(pixels + (1 * cfg->numCornerPixels), cfg->numCornerPixels);
 	
 	counter_start = counter;
@@ -190,7 +186,6 @@ void calcNoiseCorners(image *imgData, config* cfg){
 			}
 		}
 	}
-	cout << "avg c0 num pixels " << counter - counter_start << endl;
 	corners[2] = getAvg(pixels + (2 * cfg->numCornerPixels), cfg->numCornerPixels);
 	
 	counter_start = counter;
@@ -210,7 +205,6 @@ void calcNoiseCorners(image *imgData, config* cfg){
 			}
 		}
 	}
-	cout << "avg c0 num pixels " << counter - counter_start << endl;
 	corners[3] = getAvg(pixels + (3 * cfg->numCornerPixels), cfg->numCornerPixels);
 	
 	// simple k.o.-system, highest mean looses
