@@ -2,11 +2,9 @@
 #include "image_helper.h"
 #include "math_helpers.h"
 #include <sstream>
-#include <iostream>
 
 void moveImage(config* cfg, image* curImg, int32_t moveX, int32_t moveY) {
 	// crop centered image
-	cout << "move x " << moveX << " move y " << moveY << endl;
 	// postive values of moveY indicate that the center of the image should be moved up, negative values indicate moving down
 	if (moveY < 0) {
 		memmove(curImg->rawBitmap + -moveY*  cfg->imageResX, curImg->rawBitmap, cfg->imageResX*  (cfg->imageResY + moveY));
@@ -101,7 +99,6 @@ void centerThread(config* cfg) {
 
 		// send the image to the next thread
 		cfg->mAverage.lock();
-		cout << "not empty anymore" << endl;
 		cfg->qAverage.push(curImg);
 		cfg->statQlen3++;
 		cfg->mAverage.unlock();
