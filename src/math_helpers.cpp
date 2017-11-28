@@ -84,10 +84,20 @@ noise calcNoise(uint8_t *pixels) {
 }
 
 void calcCornerSize(config *cfg){
-	uint32_t triHeight, maxDiameterPx;
-	maxDiameterPx = (uint32_t)(cfg->imageResY * cfg->maxDiameter);
-	triHeight = (uint32_t)sqrt(2*pow(maxDiameterPx,2))/2;
+	/* Use the shorter edge of the image and calculate the diagonale.
+	 * Subtract the planet diameter and use half of the remaining
+	 * corners for calculating the noise.
+	 */
+	uint32_t triHeight, maxDiameterPx, imageDiag;
+	if (cfg->imageResY < cfg->imageResX) {
+		maxDiameterPx = (uint32_t)(cfg->imageResY * cfg->maxDiameter);
+		imageDiag = (uint32_t)sqrt(pow(cfg->imageResY,2) + pow(cfg->imageResY,2));
+	} else {
+		maxDiameterPx = (uint32_t)(cfg->imageResX * cfg->maxDiameter);
+		imageDiag = (uint32_t)sqrt(pow(cfg->imageResX,2) + pow(cfg->imageResX,2));
+	}
 
+	triHeight = (imageDiag - maxDiameterPx) / 2;
 	if (cfg->verbosity >= 3)
 	{
 		stringstream ss;
