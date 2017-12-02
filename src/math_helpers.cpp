@@ -171,7 +171,7 @@ void calcNoiseCorners(image *imgData, config* cfg){
 		minY++;
 		for (uint32_t y = minY; y < maxY; y++) {
 			pixels[counter++] = imgData->rawBitmap[y * cfg->imageResX + x];
-			if (cfg->verbosity >= 3)
+			if (cfg->verbosity >= 4)
 			{
 				imgData->rawBitmap[y * cfg->imageResX + x] = 150;
 			}
@@ -190,7 +190,7 @@ void calcNoiseCorners(image *imgData, config* cfg){
 		maxY++;
 		for (uint32_t y = minY; y < maxY; y++) {
 			pixels[counter++] = imgData->rawBitmap[y * cfg->imageResX + x];
-			if (cfg->verbosity >= 3)
+			if (cfg->verbosity >= 4)
 			{
 				imgData->rawBitmap[y * cfg->imageResX + x] = 200;
 			}
@@ -209,7 +209,7 @@ void calcNoiseCorners(image *imgData, config* cfg){
 		minY--; 
 		for (uint32_t y = minY; y < maxY; y++) {
 			pixels[counter++] = imgData->rawBitmap[y * cfg->imageResX + x];
-			if (cfg->verbosity >= 3)
+			if (cfg->verbosity >= 4)
 			{
 				imgData->rawBitmap[y * cfg->imageResX + x] = 250;
 			}
