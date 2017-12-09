@@ -149,7 +149,7 @@ struct config {
 	// 05: check thread
 	double checkSNR;					// = 5 signal-to-noise ratio to qualify as candidate
 	double checkRadius;					// = 1.00 radius to qualify as candidate
-	int32_t verbosity;					// = 1; standard, 2 = more, 3 = all, 4 = debug, may change result, 0 = none
+	uint8_t verbosity;					// = 1; standard, 2 = more, 3 = all, 4 = debug, may change result, 0 = none
 	float framerate;					// framerate of incoming images
 	float rayBrightnessThreshold;		// = 0.3 limb darkening threshold 
 
