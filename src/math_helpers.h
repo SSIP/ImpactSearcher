@@ -41,7 +41,8 @@ void calcNoiseCorners(image *imgData, config *cfg);
 void calcCornerSize(config *cfg);
 
 // calc noise from array of pixel values
-noise calcNoise(uint32_t *pixels);
+noise calcNoise(uint8_t *pixels, uint32_t size);
+noise calcNoise16(int16_t *pixels, uint32_t size);
 
 // parameter is subtracted image
 // calculate noise in corners of image
