@@ -1,5 +1,7 @@
 #include "libimse.h"
 #include "image_helper.h"
+#include "math_helpers.h"
+#include <iostream>
 
 void presortThread(config* cfg) {
 	image* curImg = NULL;
@@ -24,6 +26,42 @@ void presortThread(config* cfg) {
 
 		// curImg now contains the current image ready for presorting
 		bool imgIsInteresting = false;
+
+		// copy the section of the diff image that contains the planet
+		uint32_t minX, maxX, minY, maxY, size, counter;
+		minX = cfg->imageResX * ((1 - cfg->maxDiameter) / 2);
+		maxX = cfg->imageResX - cfg->imageResX * ((1 - cfg->maxDiameter) / 2);
+		minY = cfg->imageResY * ((1 - cfg->maxDiameter) / 2);
+		maxY = cfg->imageResY - cfg->imageResY * ((1 - cfg->maxDiameter) / 2);
+		size = (maxX - minX + 1) * (maxY - minY + 1);
+		int16_t *planet;
+		counter = 0;
+		int16_t val;
+		planet = (int16_t*) malloc(size);
+		for (uint32_t x = minX; x < maxX; x++){
+			for (uint32_t y = minY; y < maxY; y++){
+				cout << "size " << size << endl;
+				cout << "pixel " << y*cfg->imageResX + x << endl;
+				cout << "counter " << counter << endl;
+				val = curImg->diffBitmap[y*cfg->imageResX + x];
+				cout << "got val: " << val << endl;
+				planet[counter] = val;
+				cout << "set val, counter" << counter << endl;
+				counter++;
+				cout << "incremented counter" << endl;
+			}
+		}
+
+		noise avgNoise;
+		avgNoise = calcNoise16(planet, size);
+		cout << avgNoise.stdDev << endl;
+		double threshold = cfg->checkSNR * avgNoise.stdDev;
+		
+		for(uint32_t x = 0; x < size; x++) {
+			if(planet[x] > threshold)
+				cout << "yay " << x << planet[x] << endl;
+		}
+		delete[] planet;
 
 		/* new algorithm:
 			- get the planet's area of interest from the raycenter algorithm
