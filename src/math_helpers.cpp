@@ -55,31 +55,60 @@ deltacoords massCenter(image* frame, config* cfg){
 }
 
 // Params: Array containing pixel values, 
-double getAvg(uint8_t *pixels, uint32_t length)
+double getAvg(uint8_t *pixels, uint32_t size)
 {
 	uint64_t sum = 0;
-	for(uint32_t x = 0; x < length; x++){
+	for(uint32_t x = 0; x < size; x++){
 		sum += pixels[x];
 	}
-	return (double)sum/length;
+	return (double)sum/size;
 }
 
-double getVariance(double mean, uint8_t *pixels)
+// Params: Array containing pixel values, 
+double getAvg16(int16_t *pixels, uint32_t size)
+{
+	int64_t sum = 0;
+	for(uint32_t x = 0; x < size; x++){
+		sum += pixels[x];
+	}
+	return (double)sum/size;
+}
+
+double getVariance(double mean, uint8_t *pixels, uint32_t size)
 {
 	// is a double_t sufficient for the numbers?
 	double_t temp = 0;
-	for(uint32_t x = 0; x < sizeof(pixels); x++){
+	for(uint32_t x = 0; x < size; x++){
 		temp += (pixels[x]-mean)*(pixels[x]-mean);
 	}
-	return temp/sizeof(pixels);
+	return temp/size;
 }
 
-noise calcNoise(uint8_t *pixels) {
+double getVariance16(double mean, int16_t *pixels, uint32_t size)
+{
+	// is a double_t sufficient for the numbers?
+	double_t temp = 0;
+	for(uint32_t x = 0; x < size; x++){
+		temp += (pixels[x]-mean)*(pixels[x]-mean);
+	}
+	return temp/size;
+}
+
+noise calcNoise16(int16_t *pixels, uint32_t size) {
 	noise result;
-	result.average = getAvg(pixels, sizeof(pixels));
-	result.variance = getVariance(result.average, pixels);
+	result.average = getAvg16(pixels, size);
+	result.variance = getVariance16(result.average, pixels, size);
 	result.stdDev = sqrt(result.variance);
-	result.sampleSize = sizeof(pixels);
+	result.sampleSize = size;
+	return result;
+}
+
+noise calcNoise(uint8_t *pixels, uint32_t size) {
+	noise result;
+	result.average = getAvg(pixels, size);
+	result.variance = getVariance(result.average, pixels, size);
+	result.stdDev = sqrt(result.variance);
+	result.sampleSize = size;
 	return result;
 }
 
@@ -256,7 +285,7 @@ void calcNoiseCorners(image *imgData, config* cfg){
 		}
 	}
 	imgData->imgNoise.average = sum / 3;
-	imgData->imgNoise.variance = getVariance(imgData->imgNoise.average, totalPixels);
+	imgData->imgNoise.variance = getVariance(imgData->imgNoise.average, totalPixels, 3*cfg->numCornerPixels);
 	imgData->imgNoise.stdDev= sqrt(imgData->imgNoise.variance);
 
 	delete[] totalPixels;
