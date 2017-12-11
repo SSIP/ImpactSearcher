@@ -99,14 +99,15 @@ struct image {
  * 
  *  Y axis
  */
-	uint32_t frameNo;
-	string fileName;
-	uint8_t* rawBitmap;
-	int16_t* diffBitmap;
-	noise imgNoise;
-	forward_list<impact>* impacts;
-	time_t timestamp;
-	uint32_t diffHistogram[512];
+	int16_t candidate;				// value of pixel with greatest deviation from average beyond threshold
+	uint32_t frameNo;				// number of frame counted in input thread
+	string fileName;				// filename. what else to say?
+	uint8_t* rawBitmap;				// array with pixel values, size = imageResY * imageResX
+	int16_t* diffBitmap;			// pixel values of leading average minus trailing average. values should be small values around 0
+	noise imgNoise, diffNoise;		// noise in corners of original image, noise of planet box in diffBitmap
+	forward_list<impact>* impacts;	// jackpot
+	time_t timestamp;				// can we read this from the image header or file creation timestamp?
+	uint32_t diffHistogram[512];	// not used (yet) ... remove?
 	uint32_t interestingStartValue;
 
 	// fit of circle around planet. image is centered on planet center.

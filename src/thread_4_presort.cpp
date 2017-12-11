@@ -2,10 +2,34 @@
 #include "image_helper.h"
 #include "math_helpers.h"
 #include <iostream>
+#include <sstream>
 
 void presortThread(config* cfg) {
 	image* curImg = NULL;
+	int16_t *planet;
 
+	// Calculate a box around the centered planet, based on the maximum expected diameter
+	// This reduces the workload for calculating the noise and also excludes background.
+	// (best case) TODO: get area of planet (circle) and use only that.
+	uint32_t minX, maxX, minY, maxY, size, counter, border;
+	if(cfg->imageResX > cfg->imageResY)
+		border = cfg->imageResY;
+	else
+		border = cfg->imageResX;
+	border = border * (1 - cfg->maxDiameter) / 2;
+	minX = border;
+	maxX = cfg->imageResX - border;
+	minY = border;
+	maxY = cfg->imageResY - border;
+	size = (maxX - minX) * (maxY - minY);
+	if (cfg->verbosity >= 0)
+	{
+		stringstream ss;
+		ss << "size " << size << " minX " << minX << " maxX " << maxX << " minY " << minY << " maxY " << maxY;
+		cfg->mMessages.lock();
+		cfg->qMessages.push(ss.str());
+		cfg->mMessages.unlock();
+	}
 	for (; cfg->shutdownThread != 4; this_thread::sleep_for(chrono::milliseconds(10))) {
 		// wait for the ui
 		cfg->mUiAverage.lock();
@@ -28,40 +52,35 @@ void presortThread(config* cfg) {
 		bool imgIsInteresting = false;
 
 		// copy the section of the diff image that contains the planet
-		uint32_t minX, maxX, minY, maxY, size, counter;
-		minX = cfg->imageResX * ((1 - cfg->maxDiameter) / 2);
-		maxX = cfg->imageResX - cfg->imageResX * ((1 - cfg->maxDiameter) / 2);
-		minY = cfg->imageResY * ((1 - cfg->maxDiameter) / 2);
-		maxY = cfg->imageResY - cfg->imageResY * ((1 - cfg->maxDiameter) / 2);
-		size = (maxX - minX + 1) * (maxY - minY + 1);
-		int16_t *planet;
 		counter = 0;
 		int16_t val;
-		planet = (int16_t*) malloc(size);
+		planet = (int16_t*) malloc(2 * size);
 		for (uint32_t x = minX; x < maxX; x++){
 			for (uint32_t y = minY; y < maxY; y++){
-				cout << "size " << size << endl;
-				cout << "pixel " << y*cfg->imageResX + x << endl;
-				cout << "counter " << counter << endl;
-				val = curImg->diffBitmap[y*cfg->imageResX + x];
-				cout << "got val: " << val << endl;
-				planet[counter] = val;
-				cout << "set val, counter" << counter << endl;
+				planet[counter] = curImg->diffBitmap[y*cfg->imageResX + x];
 				counter++;
-				cout << "incremented counter" << endl;
 			}
 		}
 
-		noise avgNoise;
-		avgNoise = calcNoise16(planet, size);
-		cout << avgNoise.stdDev << endl;
-		double threshold = cfg->checkSNR * avgNoise.stdDev;
+		curImg->diffNoise = calcNoise16(planet, size);
+		double threshold = curImg->diffNoise.average + cfg->checkSNR * curImg->diffNoise.stdDev;
 		
+		int16_t max;
+		curImg->candidate = -32768;
 		for(uint32_t x = 0; x < size; x++) {
-			if(planet[x] > threshold)
-				cout << "yay " << x << planet[x] << endl;
+			if(planet[x] > threshold && planet[x] > curImg->candidate) {
+				curImg->candidate = planet[x];
+			}
 		}
-		delete[] planet;
+		if (cfg->verbosity >= 2 && curImg->candidate != -32768)
+		{
+			stringstream ss;
+			ss << "Candidate image: " << curImg->frameNo << ", average: " << curImg->diffNoise.average << ", standard deviation: " << curImg->diffNoise.stdDev << ", value: " << curImg->candidate;
+			cfg->mMessages.lock();
+			cfg->qMessages.push(ss.str());
+			cfg->mMessages.unlock();
+		}
+		free(planet);
 
 		/* new algorithm:
 			- get the planet's area of interest from the raycenter algorithm
