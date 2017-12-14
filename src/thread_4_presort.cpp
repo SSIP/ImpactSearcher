@@ -1,7 +1,6 @@
 #include "libimse.h"
 #include "image_helper.h"
 #include "math_helpers.h"
-#include <iostream>
 #include <sstream>
 
 void presortThread(config* cfg) {

@@ -32,7 +32,7 @@ struct bitmapInfoHeader {
 #pragma pack(pop)
 
 // Code loosely inspired by http://tipsandtricks.runicsoft.com/Cpp/BitmapTutorial.html
-uint8_t* bmp_read(const string fileName, const uint64_t fileSize, const uint32_t width, const uint32_t height) {
+uint8_t* bmp_read(config *cfg, const string fileName, const uint64_t fileSize, const uint32_t width, const uint32_t height) {
 	// open output file
 	FILE* fIn;
 	if ((fIn = fopen(fileName.c_str(), "rb")) == 0)
@@ -68,7 +68,7 @@ uint8_t* bmp_read(const string fileName, const uint64_t fileSize, const uint32_t
 
 	// if this is the first image, call initializer
 	if (width == 0 || height == 0)
-		initImageParameters(info_header->biWidth, info_header->biHeight);
+		initImageParameters(cfg, info_header->biWidth, info_header->biHeight);
 
 	// otherwise, check width and height
 	else if (info_header->biWidth != width || info_header->biHeight != height)
