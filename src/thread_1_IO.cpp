@@ -16,6 +16,7 @@ void ioThread(config* cfg) {
 	g_cfg = cfg;
 	image* curImg;
 	uint32_t frameNo = 0;
+	bool firstLoop = true;
 
 	for (; cfg->shutdownThread != 1; this_thread::sleep_for(chrono::milliseconds(10))) {
 
@@ -45,6 +46,10 @@ void ioThread(config* cfg) {
 			// update statistics
 			cfg->statFramesIO++;
 
+			if(firstLoop){
+				thread(centerThread, cfg).detach();
+				firstLoop = false;
+			}
 			// send the image to the next thread
 			cfg->mCenter.lock();
 			cfg->qCenter.push(curImg);

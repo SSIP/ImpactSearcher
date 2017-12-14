@@ -7,7 +7,7 @@
 void presortThread(config* cfg) {
 	image* curImg = NULL;
 	int16_t *planet;
-
+	bool firstLoop = true;
 	// Calculate a box around the centered planet, based on the maximum expected diameter
 	// This reduces the workload for calculating the noise and also excludes background.
 	// (best case) TODO: get area of planet (circle) and use only that.
@@ -89,18 +89,22 @@ void presortThread(config* cfg) {
 			- if more than 2 of these pixels are adjacent, this is an impact candidate
 		*/
 		
-		if (imgIsInteresting) {
-			// send the image to the next thread
-			cfg->mCheck.lock();
-			cfg->qCheck.push(curImg);
-			cfg->statQlen5++;
-			cfg->mCheck.unlock();
-			cfg->statInteresting++;
-			curImg = NULL;
-		} else {
+		//if (imgIsInteresting) {
+		if(firstLoop){
+			thread(checkThread, cfg).detach();
+			firstLoop = false;
+		}
+		// send the image to the next thread
+		cfg->mCheck.lock();
+		cfg->qCheck.push(curImg);
+		cfg->statQlen5++;
+		cfg->mCheck.unlock();
+		cfg->statInteresting++;
+		curImg = NULL;
+		/*} else {
 			// delete the image
 			delete curImg;
-		}
+		}*/
 	}
 
 	// propagate shutdown to the next thread

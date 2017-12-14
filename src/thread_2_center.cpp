@@ -34,6 +34,7 @@ void centerThread(config* cfg) {
 	image* curImg = NULL;
 	bool firstAvg = false;
 	int32_t firstAvgCount = 0;
+	bool firstLoop = true;
 	calcCornerSize(cfg);
 	for (; cfg->shutdownThread != 2; this_thread::sleep_for(chrono::milliseconds(10))) {
 		// get the next image from our queue
@@ -95,7 +96,10 @@ void centerThread(config* cfg) {
 		// save the image for debugging
 		//if (cfg->verbosity >= 3)
 		//	debugPng(curImg->fileName, "_centered.png", curImg->rawBitmap);
-
+		if(firstLoop){
+			thread(averageThread, cfg).detach();
+			firstLoop = false;
+		}
 		// send the image to the next thread
 		cfg->mAverage.lock();
 		cfg->qAverage.push(curImg);
