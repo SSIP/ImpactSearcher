@@ -1,7 +1,7 @@
 #pragma once
 #include "libimse.h"
 
-void initImageParameters(const uint32_t width, const uint32_t height);
+void initImageParameters(config *cfg, const uint32_t width, const uint32_t height);
 
 /*
 *	variable length byte storage class

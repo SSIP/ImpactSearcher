@@ -3,19 +3,17 @@
 #include "filesystem.h"
 #include <sstream>
 
-static config* g_cfg;
-
-void initImageParameters(const uint32_t width, const uint32_t height) {
-	g_cfg->imageResX = width;
-	g_cfg->imageResY = height;
-	g_cfg->leadingAverage = new averageImage(width, height, g_cfg->leadingAverageLength);
-	g_cfg->trailingAverage = new averageImage(width, height, g_cfg->trailingAverageLength);
+void initImageParameters(config *cfg, const uint32_t width, const uint32_t height) {
+	cfg->imageResX = width;
+	cfg->imageResY = height;
+	cfg->leadingAverage = new averageImage(width, height, cfg->leadingAverageLength);
+	cfg->trailingAverage = new averageImage(width, height, cfg->trailingAverageLength);
 }
 
 void ioThread(config* cfg) {
-	g_cfg = cfg;
 	image* curImg;
 	uint32_t frameNo = 0;
+	bool firstLoop = true;
 
 	for (; cfg->shutdownThread != 1; this_thread::sleep_for(chrono::milliseconds(10))) {
 
@@ -36,7 +34,7 @@ void ioThread(config* cfg) {
 				cfg->mMessages.unlock();
 			}
 			// read the source bitmap
-			auto inputData = bmp_read(it->name, it->size, cfg->imageResX, cfg->imageResY);
+			auto inputData = bmp_read(cfg, it->name, it->size, cfg->imageResX, cfg->imageResY);
 			
 			// emplace the input data into a new image struct
 			curImg = new image(cfg->imageResX, cfg->imageResY, inputData, frameNo);
@@ -45,6 +43,10 @@ void ioThread(config* cfg) {
 			// update statistics
 			cfg->statFramesIO++;
 
+			if(firstLoop){
+				thread(centerThread, cfg).detach();
+				firstLoop = false;
+			}
 			// send the image to the next thread
 			cfg->mCenter.lock();
 			cfg->qCenter.push(curImg);

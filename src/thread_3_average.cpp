@@ -13,7 +13,7 @@ void averageThread(config* cfg) {
 	image* curImg = NULL;
 	queue<image*> qBuf1, qBuf2, qBuf3;
 	uint32_t len1 = 0, len2 = 0, len3 = 0; // length of leading average, frame buffer, trailing average
-
+	bool firstLoop;
 	for (; cfg->shutdownThread != 3; this_thread::sleep_for(chrono::milliseconds(10))) {
 		// wait for the ui
 		cfg->mUiCenter.lock();
@@ -92,6 +92,10 @@ void averageThread(config* cfg) {
 			pixelSum += curImg->diffBitmap[i] = cfg->leadingAverage->currentAverage[i] - cfg->trailingAverage->currentAverage[i];
 		//curImg->avgValue = pixelSum / (cfg->imageResX*  cfg->imageResY);
 
+		if(firstLoop){
+			thread(presortThread, cfg).detach();
+			firstLoop = false;
+		}
 		// send the image to the next thread
 		cfg->mPresort.lock();
 		cfg->qPresort.push(curImg);
