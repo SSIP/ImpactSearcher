@@ -186,5 +186,7 @@ void averageThread(config* cfg);
 void presortThread(config* cfg);
 void checkThread(config* cfg);
 
+void loadDefaultConfig(config* cfg);
+
 LIB_PUBLIC void impactSearcherStart(config *cfg);
 LIB_PUBLIC void impactSearcherStop(config *cfg);
