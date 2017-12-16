@@ -3,6 +3,13 @@
 #include "math_helpers.h"
 #include <sstream>
 
+/* This thread calculates the noise of the diff image and searches for values
+ * that are above a critical signal to noise ratio. It gets the images from
+ * the average thread. The SNR should be above 5 or 10,
+ * see https://www.eso.org/~ohainaut/ccd/sn.html
+ * If a pixel above the critical value is detected, it will be flagged.
+ * The images are then pusehd to the final check thread.
+ */
 void presortThread(config* cfg) {
 	image* curImg = NULL;
 	int16_t *planet;
