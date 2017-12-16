@@ -2,6 +2,21 @@
 #include <algorithm>
 #include <sstream>
 
+/* Calculate the center of the planet. This requires coordinates that are already
+ * within the area of the planet.
+ * From this approximate center go into several directions until the signal drops
+ * below 5 to 10 sigma of the background noise. This is regarded as the edge of
+ * the planet.
+ *
+ * Param approximateCenter is an estimate of the center of the planet usually calculated with massCenter function.
+ * Param *frame is a frame that contains the image of a planet.
+ * Param numberRays is the number of rays which start from the center. 1 means 4 rays with an angle of 90 degrees
+ *       between each other will be used, 2 are 8 rays with 45 degrees between each other.
+ * Param *cfg is a reference to the global configuration. Needed for image resolution and background noise.
+ *
+ * Return a struct that contains signed integers in which direction to move the image in order
+ * to center the planet.
+ */
 deltacoords rayCenter(coordinates approximateCenter, image* frame, int32_t numberRays, config* cfg){
 	int32_t i;
 	float rayAngle = (float)M_PI / numberRays;
@@ -29,6 +44,14 @@ deltacoords rayCenter(coordinates approximateCenter, image* frame, int32_t numbe
 	return deltacoords{ 0, 0 };
 }
 
+/* Calculate the center of the planet with a simple center of mass like algorithm.
+ *
+ * Param *frame is a frame that contains the image of a planet.
+ * Param *cfg is a reference to the global configuration. Needed for image resolution and background noise.
+ *
+ * Return a struct that contains signed integers in which direction to move the image in order
+ * to center the planet.
+ */
 deltacoords massCenter(image* frame, config* cfg){
 	uint32_t sumX = 0, sumY = 0, sumTotal = 0, x, pixel;
 	deltacoords move;
@@ -54,7 +77,13 @@ deltacoords massCenter(image* frame, config* cfg){
 	return move;
 }
 
-// Params: Array containing pixel values, 
+/* Calculate the average value of an 8 bit unsigned integers array, usually pixel values.
+ *
+ * Param *pixels is a array of pixel brightness values.
+ * Param size is the amount of pixels in the array *pixels
+ *
+ * Return the average of the values with double precission.
+ */
 double getAvg(uint8_t *pixels, uint32_t size)
 {
 	uint64_t sum = 0;
@@ -64,7 +93,15 @@ double getAvg(uint8_t *pixels, uint32_t size)
 	return (double)sum/size;
 }
 
-// Params: Array containing pixel values, 
+/* Calculate the average value of an 16 bit signed integers array, usually pixel values.
+ * This function is required for the subtraction between the leading and trailing average
+ * images.
+ *
+ * Param *pixels is a array of pixel brightness values.
+ * Param size is the amount of pixels in the array *pixels.
+ *
+ * Return the average of the values with double precission.
+ */
 double getAvg16(int16_t *pixels, uint32_t size)
 {
 	int64_t sum = 0;
@@ -74,35 +111,51 @@ double getAvg16(int16_t *pixels, uint32_t size)
 	return (double)sum/size;
 }
 
-double getVariance(double mean, uint8_t *pixels, uint32_t size)
+/* Calculate the statistical variance of an 8 bit unsigned integers array, usually pixel values.
+ *
+ * Param avg is the already known average value of the values in *pixels.
+ * Param *pixels is a array of pixel brightness values.
+ * Param size is the amount of pixels in the array *pixels.
+ *
+ * Return the average of the values with double precission.
+ */
+double getVariance(double avg, uint8_t *pixels, uint32_t size)
 {
 	// is a double_t sufficient for the numbers?
 	double_t temp = 0;
 	for(uint32_t x = 0; x < size; x++){
-		temp += (pixels[x]-mean)*(pixels[x]-mean);
+		temp += (pixels[x]-avg)*(pixels[x]-avg);
 	}
 	return temp/size;
 }
 
-double getVariance16(double mean, int16_t *pixels, uint32_t size)
+/* Calculate the statistical variance of an 16 bit signed integers array, usually pixel values.
+ * This function is required for the subtraction between the leading and trailing average
+ * images.
+ *
+ * Param avg is the already known average value of the values in *pixels.
+ * Param *pixels is a array of pixel brightness values.
+ * Param size is the amount of pixels in the array *pixels.
+ *
+ * Return the average of the values with double precission.
+ */
+double getVariance16(double avg, int16_t *pixels, uint32_t size)
 {
 	// is a double_t sufficient for the numbers?
 	double_t temp = 0;
 	for(uint32_t x = 0; x < size; x++){
-		temp += (pixels[x]-mean)*(pixels[x]-mean);
+		temp += (pixels[x]-avg)*(pixels[x]-avg);
 	}
 	return temp/size;
 }
 
-noise calcNoise16(int16_t *pixels, uint32_t size) {
-	noise result;
-	result.average = getAvg16(pixels, size);
-	result.variance = getVariance16(result.average, pixels, size);
-	result.stdDev = sqrt(result.variance);
-	result.sampleSize = size;
-	return result;
-}
-
+/* Calculate the noise of an 8 bit unsigned integers array, usually pixel values.
+ *
+ * Param *pixels is a array of pixel brightness values.
+ * Param size is the amount of pixels in the array *pixels.
+ *
+ * Return the noise struct
+ */
 noise calcNoise(uint8_t *pixels, uint32_t size) {
 	noise result;
 	result.average = getAvg(pixels, size);
@@ -112,6 +165,31 @@ noise calcNoise(uint8_t *pixels, uint32_t size) {
 	return result;
 }
 
+/* Calculate the noise of an 16 bit signed integers array, usually pixel values.
+ * This function is required for the subtraction between the leading and trailing average
+ * images.
+ *
+ * Param *pixels is a array of pixel brightness values.
+ * Param size is the amount of pixels in the array *pixels.
+ *
+ * Return the noise struct
+ */
+noise calcNoise16(int16_t *pixels, uint32_t size) {
+	noise result;
+	result.average = getAvg16(pixels, size);
+	result.variance = getVariance16(result.average, pixels, size);
+	result.stdDev = sqrt(result.variance);
+	result.sampleSize = size;
+	return result;
+}
+
+/* Calculate the size (number of pixels) of the corners. This depends on the estimated size
+ * of the planet, defined by cfg->maxDiameter.
+ *
+ * Param cfg is the global configuration
+ *
+ * Return void, stores the result in the global configuration 
+ */
 void calcCornerSize(config *cfg){
 	/* Use the shorter edge of the image and calculate the diagonale.
 	 * Subtract the planet diameter and use half of the remaining
@@ -143,6 +221,15 @@ void calcCornerSize(config *cfg){
 	}
 }
 
+/* Calculate the background noise by using 3 of 4 corners. The corner with
+ * the highest average value will not be used. This removes the possibilty that
+ * the planet brightness will accidentially influence the background noise.
+ *
+ * Param *imgData is the array with the pixels
+ * Param cfg is the global configuration
+ *
+ * Return void, stores the result in the global configuration 
+ */
 void calcNoiseCorners(image *imgData, config* cfg){
 
 	uint8_t *pixels;

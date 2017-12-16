@@ -31,7 +31,15 @@ struct bitmapInfoHeader {
 // restore memory alignment to original value
 #pragma pack(pop)
 
-// Code loosely inspired by http://tipsandtricks.runicsoft.com/Cpp/BitmapTutorial.html
+/* Read BMP images from file system.
+ * Code loosely inspired by http://tipsandtricks.runicsoft.com/Cpp/BitmapTutorial.html
+ *
+ * Param *cfg is the global configuration
+ * Param stringFilename is the full path to the file
+ * Param fileSize is the size of the file that will be read
+ * Param width is the image width
+ * Param heigth is the height of the image
+ */
 uint8_t* bmp_read(config *cfg, const string fileName, const uint64_t fileSize, const uint32_t width, const uint32_t height) {
 	// open output file
 	FILE* fIn;
