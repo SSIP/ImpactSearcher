@@ -9,6 +9,20 @@
 	then fit an ellipse
 */
 
+/* This thread gets images from the centering thread and creates average images from several
+ * frames to reduce the noise when subtracting images. The thread will first fill the
+ * leading average image, then a buffer between leading and trailing average and at last
+ * the trailing average. As soon as all buffers are full, a subtraction is created by
+ * subtracting the trailing average from the leading average. If there is a bright spot
+ * in the leading average, it will remain in the subtracted image. The subtracted is
+ * stored with the frame that is poped from the trailing average buffer.
+ *
+ * As a result, a bright spot that is coming from an image newly added to the leading
+ * average will now be in the average that is stored with the oldest image popped from
+ * the trailing average buffer.
+ *
+ * Param *cfg is the global configuration
+ */
 void averageThread(config* cfg) {
 	image* curImg = NULL;
 	queue<image*> qBuf1, qBuf2, qBuf3;

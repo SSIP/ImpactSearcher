@@ -12,6 +12,15 @@ int32_t TowDtoOneD(int32_t x, int32_t y, config* cfg)
 	return retI;
 }
 
+/* The thread gets images from the presort thread and checks flagged images
+ * in detail. If more than one pixel in a circle defined by the aperture(?)
+ * is above the critical value in the same region in more than 2 frames in
+ * a row, it will claim to have found a meteor.
+ * The thread will keep frames for roughly one second in a buffer to be able
+ * to save the preceeding images of candidates.
+ *
+ * Param *cfg is the global configuration
+ */
 void checkThread(config* cfg) {
 	image* curImg = NULL;
 
