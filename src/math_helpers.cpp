@@ -379,3 +379,29 @@ void calcNoiseCorners(image *imgData, config* cfg){
 	delete[] pixels;
 	return;
 }
+
+/* Get the n-th pixel on a radius line.
+ *
+ * Param image is the image data
+ * Param circleCenter is the center point of the circle
+ * Param direction the angle in degrees
+ * Param radius is the n-th pixel on the line
+ *
+ * Return coordinate with x and y value of the radius pixel
+ */
+coordinates radiusPixel(image *imageData, coordinates circleCenter, uint16_t angle, uint32_t radius)
+{
+	double dx = 0, dy = 0, x = 0, y = 0;
+	if((angle >= 0 and angle <= 45) or (angle >= 135 and angle <= 225) or (angle >= 315 and angle <= 360)) {
+		//iterate x
+	} else {
+		//iterate y
+	}
+	dx = cos(angle); //delta x
+	dy = sin(angle); //delta y
+	uint32_t counter = 0;
+	for(;;) {
+		x++;
+		y = round(x*dy);
+	}
+}
