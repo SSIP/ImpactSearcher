@@ -6,10 +6,10 @@
 /* Function to move the planet in a frame. Used for centering after center
  * has been calculated.
  *
- * Param *cfg is the global configuration
- * Param *curImg is the image that will be processed
- * Param moveX the number of pixels in x (left/right) direction in which to move the planet
- * Param moveY the number of pixels in y (up/down) direction in which to move the planet
+ * @cfg:          global configuration
+ * @curImg:       image that will be processed
+ * @moveX:        number of pixels in x (left/right) direction in which to move the planet
+ * @moveY:        number of pixels in y (up/down) direction in which to move the planet
  *
  * Return void, the original curImg will be manipulated
  */
@@ -44,7 +44,7 @@ void moveImage(config* cfg, image* curImg, int32_t moveX, int32_t moveY) {
  * the center of the planet and moves the planet within the image. The
  * centerd image is then pushed into a queue to the averaging thread.
  *
- * Param *cfg is the global configuration
+ * @cfg:          the global configuration
  */
 void centerThread(config* cfg) {
 	image* curImg = NULL;

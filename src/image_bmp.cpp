@@ -34,11 +34,11 @@ struct bitmapInfoHeader {
 /* Read BMP images from file system.
  * Code loosely inspired by http://tipsandtricks.runicsoft.com/Cpp/BitmapTutorial.html
  *
- * Param *cfg is the global configuration
- * Param stringFilename is the full path to the file
- * Param fileSize is the size of the file that will be read
- * Param width is the image width
- * Param heigth is the height of the image
+ * @cfg:          the global configuration
+ * @stringFilename: the full path to the file
+ * @fileSize:     the size of the file that will be read
+ * @width:        the image width
+ * @heigth:       the height of the image
  */
 uint8_t* bmp_read(config *cfg, const string fileName, const uint64_t fileSize, const uint32_t width, const uint32_t height) {
 	// open output file

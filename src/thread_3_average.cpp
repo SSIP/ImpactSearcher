@@ -21,7 +21,7 @@
  * average will now be in the average that is stored with the oldest image popped from
  * the trailing average buffer.
  *
- * Param *cfg is the global configuration
+ * @cfg:          global configuration
  */
 void averageThread(config* cfg) {
 	image* curImg = NULL;
