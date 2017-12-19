@@ -6,9 +6,9 @@
 /* Set the configuration parameters that are known as soon as the first image is read.
  * We assume that the image parameters (width and height) do not change.
  *
- * Param cfg is the global configuration
- * Param width is the image width (number of pixels)
- * Param height is the image height (number of pixels)
+ * @cfg:          global configuration
+ * @width:        image width (number of pixels)
+ * @height:       image height (number of pixels)
  */
 void initImageParameters(config *cfg, const uint32_t width, const uint32_t height) {
 	cfg->imageResX = width;
@@ -20,7 +20,7 @@ void initImageParameters(config *cfg, const uint32_t width, const uint32_t heigh
 /* This thread checks for images in the source folder, reads them, and pushes them
  * into a queue to the centering thread.
  *
- * Param *cfg is the global configuration
+ * @cfg:          global configuration
  */
 void ioThread(config* cfg) {
 	image* curImg;

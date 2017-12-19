@@ -14,7 +14,7 @@ LIB_PUBLIC void impactSearcherStop(config *cfg) {
 
 /* Set a standard configuration
  *
- * Param *cfg is the reference to the configuration struct
+ * @cfg:          reference to the configuration struct
  */
 void loadDefaultConfig(config* cfg) {
 	// set resolution to 0 if unknown
