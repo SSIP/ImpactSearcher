@@ -373,8 +373,6 @@ void calcNoiseCorners(image *imgData, config* cfg){
 	delete[] pixels;
 	return;
 }
-<<<<<<< Updated upstream
-=======
 
 /* Get the n-th pixel on a radius line. angle must be >=0 and <=360
  *
@@ -413,4 +411,3 @@ coordinates radiusPixel(coordinates circleCenter, uint16_t angle, uint32_t radiu
 	}
 	return result;
 }
->>>>>>> Stashed changes
