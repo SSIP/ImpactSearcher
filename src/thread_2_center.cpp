@@ -74,8 +74,8 @@ void centerThread(config* cfg) {
 		// rough center estimation with center of mass logic
 		moveCenter = massCenter(curImg, cfg);
 
-		approxCenter.x = (cfg->imageResX / 2) + moveCenter.x;
-		approxCenter.y = (cfg->imageResY / 2) + moveCenter.y;
+		approxCenter.x = (cfg->imageResX / 2) - moveCenter.x;
+		approxCenter.y = (cfg->imageResY / 2) - moveCenter.y;
 		if (cfg->verbosity >= 3)
 		{
 			stringstream ss;

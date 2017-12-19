@@ -51,4 +51,4 @@ noise calcNoise16(int16_t *pixels, uint32_t size);
 // into account. add brightness of pixels if signal > 3sigma and return as signal
 double signalToNoise(image *subtractedData);
 
-coordinates radiusPixel(coordinates circleCenter, uint16_t angle, uint32_t radius);
+coordinates radiusPixel(coordinates circleCenter, double rad, uint32_t radius);

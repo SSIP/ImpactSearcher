@@ -1,6 +1,8 @@
 #include "math_helpers.h"
 #include <algorithm>
 #include <sstream>
+#include <iostream>
+#define PI 3.14159265
 
 /* Calculate the center of the planet. This requires coordinates that are already
  * within the area of the planet.
@@ -18,14 +20,16 @@
  * to center the planet.
  */
 deltacoords rayCenter(coordinates approximateCenter, image* curImg, uint16_t numberRays, config* cfg){
-	uint16_t rayAngle = 360 / (numberRays * 4);
-	double threshold = curImg->imgNoise.stdDev * 5 + curImg->imgNoise.average;
+	double rayRad = PI / (numberRays * 2);
+	double threshold = curImg->imgNoise.stdDev * 20 + curImg->imgNoise.average;
+	cout << "new pic" << endl;
 	for (uint16_t ray = 0; ray < numberRays * 4; ray ++) {
 		uint32_t radius = 0;
+		cout << "rad " << rayRad * ray << endl;
 		while(radius <= cfg->imageResX) {
-			radius++;
 			coordinates pixel;
-			pixel = radiusPixel(approximateCenter, rayAngle * ray, radius);
+			radius++;
+			pixel = radiusPixel(approximateCenter, rayRad * ray, radius);
 			uint8_t val = curImg->rawBitmap[pixel.y * cfg->imageResX + pixel.x];
 			if ( val > threshold ) {
 				if (cfg->verbosity > 3) {
@@ -35,8 +39,10 @@ deltacoords rayCenter(coordinates approximateCenter, image* curImg, uint16_t num
 				if (cfg->verbosity > 3) {
 					curImg->rawBitmap[pixel.y * cfg->imageResX + pixel.x] = 255;
 				}
+
 				break;
 			}
+			
 		}
 	}
 	return deltacoords{ 0, 0 };
@@ -377,34 +383,34 @@ void calcNoiseCorners(image *imgData, config* cfg){
 /* Get the n-th pixel on a radius line. angle must be >=0 and <=360
  *
  * @circleCenter:  center point of the circle
- * @direction:     angle in degrees
+ * @rad:           angle in rad
  * @radius:        the n-th pixel on the line
  *
  * Return coordinate with x and y value of the radius pixel
  */
-coordinates radiusPixel(coordinates circleCenter, uint16_t angle, uint32_t radius)
+coordinates radiusPixel(coordinates circleCenter, double rad, uint32_t radius)
 
 {
 	double dx = 0, dy = 0, x = 0, y = 0;
 	coordinates result;
-	if ((angle >= 0 and angle <= 45) or (angle >= 315 and angle <= 360)) {
+	if ((rad >= 0 and rad <= 0.25 * PI) or (rad >= 1.75 * PI and rad <= 2 * PI)) {
 		//iterate x up -> go right
-		dy = sin(angle);
+		dy = sin(rad);
 		result.y = circleCenter.y + round(radius * dy);
 		result.x = circleCenter.x + radius;
-	} else if (angle >= 135 and angle <= 225) {
+	} else if (rad >= 0.75 * PI and rad <= 1.25 * PI) {
 		//iterate x down -> go left
-		dy = sin(angle);
+		dy = sin(rad);
 		result.y = circleCenter.y + round(radius * dy);
 		result.x = circleCenter.x - radius;
-	} else if (angle > 45 and angle < 135) {
+	} else if (rad > 0.25 * PI and rad < 0.75 * PI) {
 		//iterate y up -> go up
-		dx = cos(angle);
+		dx = cos(rad);
 		result.y = circleCenter.y - radius;
 		result.x = circleCenter.x + round(radius * dx);
-	} else if (angle > 225 and angle < 315) {
+	} else if (rad > 1.25 * PI and rad < 1.75 * PI) {
 		//iterate y down -> go down
-		dx = cos(angle);
+		dx = cos(rad);
 		result.y = circleCenter.y + radius;
 		result.x = circleCenter.x + round(radius * dx);
 	} else {
