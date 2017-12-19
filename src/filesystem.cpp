@@ -13,8 +13,8 @@
 /* Reads the files from the source folder. The files will be processed in the order of
  * which they are presented from the file system. FAT does not order files by file names.
  *
- * Param _dir is the source folder of the images.
- * Param extension is the file name extension, for example .bmp
+ * @_dir 		: the source folder of the images.
+ * @extension 	: the file name extension, for example .bmp
  *
  * Return a list of fileInf (file information) with file name and size
  */
@@ -99,7 +99,7 @@ list<fileInf> getFiles(string _dir, string extension) {
 
 /* Delete items in fileInf list.
  *
- * Param fileInf contains the fileInf items
+ * @fileInf:      contains the fileInf items
  */
 void deleteFiles(list<fileInf> files) {
 

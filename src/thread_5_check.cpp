@@ -19,7 +19,7 @@ int32_t TowDtoOneD(int32_t x, int32_t y, config* cfg)
  * The thread will keep frames for roughly one second in a buffer to be able
  * to save the preceeding images of candidates.
  *
- * Param *cfg is the global configuration
+ * @cfg:          global configuration
  */
 void checkThread(config* cfg) {
 	image* curImg = NULL;
