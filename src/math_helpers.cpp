@@ -20,31 +20,42 @@
  * to center the planet.
  */
 deltacoords rayCenter(coordinates approximateCenter, image* curImg, uint16_t numberRays, config* cfg){
+	// calculate the angle (in rad) between each ray.
 	double rayRad = (2 * PI) / (numberRays * 4);
+	// planets are bright. 20 sigma is considered to be the border of the planet.
 	double threshold = curImg->imgNoise.stdDev * 20 + curImg->imgNoise.average;
 	cout << "new pic" << endl;
+
+	// we need to allocate memory for storing the edge pixels
+
+	// loop through the different rays (increase the angle)
 	for (uint16_t ray = 0; ray < numberRays * 4; ray ++) {
 		uint32_t radius = 10;
 		cout << "rad " << rayRad * ray << endl;
+		// loop through pixels in ray
 		while(radius <= cfg->imageResX) {
 			coordinates pixel;
 			radius++;
 			pixel = radiusPixel(approximateCenter, rayRad * ray, radius);
 			uint8_t val = curImg->rawBitmap[pixel.y * cfg->imageResX + pixel.x];
+			// if pixel is above threshold, we're still within the planet
 			if ( val > threshold ) {
 				if (cfg->verbosity > 3) {
 					curImg->rawBitmap[pixel.y * cfg->imageResX + pixel.x] = 0;
 				}
+			// we reached the border if it is darker
 			} else {
 				if (cfg->verbosity > 3) {
 					curImg->rawBitmap[pixel.y * cfg->imageResX + pixel.x] = 255;
 				}
-
+				// idea: have 3 pixels in a row before the edge is positivly identified.
+				// todo: add found pixel to array of pixels defining the edge
 				break;
 			}
 			
 		}
 	}
+	// now we need to fit an ellipse to those coordinates.
 	return deltacoords{ 0, 0 };
 }
 
@@ -84,8 +95,7 @@ deltacoords massCenter(image* frame, config* cfg){
  *
  * Return the average of the values with double precission.
  */
-double getAvg(uint8_t *pixels, uint32_t size)
-{
+double getAvg(uint8_t *pixels, uint32_t size){
 	uint64_t sum = 0;
 	for(uint32_t x = 0; x < size; x++){
 		sum += pixels[x];
@@ -102,8 +112,7 @@ double getAvg(uint8_t *pixels, uint32_t size)
  *
  * Return the average of the values with double precission.
  */
-double getAvg16(int16_t *pixels, uint32_t size)
-{
+double getAvg16(int16_t *pixels, uint32_t size){
 	int64_t sum = 0;
 	for(uint32_t x = 0; x < size; x++){
 		sum += pixels[x];
