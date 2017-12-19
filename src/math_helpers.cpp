@@ -20,11 +20,11 @@
  * to center the planet.
  */
 deltacoords rayCenter(coordinates approximateCenter, image* curImg, uint16_t numberRays, config* cfg){
-	double rayRad = PI / (numberRays * 2);
+	double rayRad = (2 * PI) / (numberRays * 4);
 	double threshold = curImg->imgNoise.stdDev * 20 + curImg->imgNoise.average;
 	cout << "new pic" << endl;
 	for (uint16_t ray = 0; ray < numberRays * 4; ray ++) {
-		uint32_t radius = 0;
+		uint32_t radius = 10;
 		cout << "rad " << rayRad * ray << endl;
 		while(radius <= cfg->imageResX) {
 			coordinates pixel;
@@ -119,8 +119,7 @@ double getAvg16(int16_t *pixels, uint32_t size)
  *
  * Return the average of the values with double precission.
  */
-double getVariance(double avg, uint8_t *pixels, uint32_t size)
-{
+double getVariance(double avg, uint8_t *pixels, uint32_t size){
 	// is a double_t sufficient for the numbers?
 	double_t temp = 0;
 	for(uint32_t x = 0; x < size; x++){
@@ -139,8 +138,7 @@ double getVariance(double avg, uint8_t *pixels, uint32_t size)
  *
  * Return the average of the values with double precission.
  */
-double getVariance16(double avg, int16_t *pixels, uint32_t size)
-{
+double getVariance16(double avg, int16_t *pixels, uint32_t size){
 	// is a double_t sufficient for the numbers?
 	double_t temp = 0;
 	for(uint32_t x = 0; x < size; x++){
@@ -156,7 +154,7 @@ double getVariance16(double avg, int16_t *pixels, uint32_t size)
  *
  * Return the noise struct
  */
-noise calcNoise(uint8_t *pixels, uint32_t size) {
+noise calcNoise(uint8_t *pixels, uint32_t size){
 	noise result;
 	result.average = getAvg(pixels, size);
 	result.variance = getVariance(result.average, pixels, size);
@@ -174,7 +172,7 @@ noise calcNoise(uint8_t *pixels, uint32_t size) {
  *
  * Return the noise struct
  */
-noise calcNoise16(int16_t *pixels, uint32_t size) {
+noise calcNoise16(int16_t *pixels, uint32_t size){
 	noise result;
 	result.average = getAvg16(pixels, size);
 	result.variance = getVariance16(result.average, pixels, size);
@@ -388,28 +386,30 @@ void calcNoiseCorners(image *imgData, config* cfg){
  *
  * Return coordinate with x and y value of the radius pixel
  */
-coordinates radiusPixel(coordinates circleCenter, double rad, uint32_t radius)
-
-{
+coordinates radiusPixel(coordinates circleCenter, double rad, uint32_t radius){
 	double dx = 0, dy = 0, x = 0, y = 0;
 	coordinates result;
 	if ((rad >= 0 and rad <= 0.25 * PI) or (rad >= 1.75 * PI and rad <= 2 * PI)) {
 		//iterate x up -> go right
+		cout << "rad x up " << rad << endl;
 		dy = sin(rad);
 		result.y = circleCenter.y + round(radius * dy);
 		result.x = circleCenter.x + radius;
 	} else if (rad >= 0.75 * PI and rad <= 1.25 * PI) {
 		//iterate x down -> go left
+		cout << "rad x down " << rad << endl;
 		dy = sin(rad);
 		result.y = circleCenter.y + round(radius * dy);
 		result.x = circleCenter.x - radius;
 	} else if (rad > 0.25 * PI and rad < 0.75 * PI) {
 		//iterate y up -> go up
+		cout << "rad y up " << rad << endl;
 		dx = cos(rad);
 		result.y = circleCenter.y - radius;
 		result.x = circleCenter.x + round(radius * dx);
 	} else if (rad > 1.25 * PI and rad < 1.75 * PI) {
 		//iterate y down -> go down
+		cout << "rad y down " << rad << endl;
 		dx = cos(rad);
 		result.y = circleCenter.y + radius;
 		result.x = circleCenter.x + round(radius * dx);

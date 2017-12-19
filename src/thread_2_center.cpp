@@ -86,7 +86,7 @@ void centerThread(config* cfg) {
 		}
 
 		calcNoiseCorners(curImg, cfg);
-		moveCenter = rayCenter(approxCenter, curImg, (uint16_t)2, cfg);
+		moveCenter = rayCenter(approxCenter, curImg, (uint16_t)4, cfg);
 
 		// crop image
 		moveImage(cfg, curImg, moveCenter.x, moveCenter.y);
