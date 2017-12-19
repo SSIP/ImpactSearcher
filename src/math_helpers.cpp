@@ -17,28 +17,26 @@
  * Return a struct that contains signed integers in which direction to move the image in order
  * to center the planet.
  */
-deltacoords rayCenter(coordinates approximateCenter, image* frame, int32_t numberRays, config* cfg){
-	int32_t i;
-	float rayAngle = (float)M_PI / numberRays;
-
-	//turn axes of coordinates i times by rayAngle
-	for (i = 1; i < numberRays; i++){
-		int32_t brightestValue, radius;
-
-		//initial value of center pixel
-		brightestValue = frame->rawBitmap[approximateCenter.x + approximateCenter.y*  cfg->imageResX];
-
-		radius = 1;
-
-		int32_t stopX(0), stopY(0);
-
-		//increase radius by one, check if pixel is brighter. if brightness < threshold, jupiter radius has been reached
-		while (stopX == 0 || stopY == 0){
-			//cross section in "x" direction
-
-			//cross section in "y" direction
-
+deltacoords rayCenter(coordinates approximateCenter, image* curImg, uint16_t numberRays, config* cfg){
+	uint16_t rayAngle = 360 / (numberRays * 4);
+	double threshold = curImg->imgNoise.stdDev * 5 + curImg->imgNoise.average;
+	for (uint16_t ray = 0; ray < numberRays * 4; ray ++) {
+		uint32_t radius = 0;
+		while(radius <= cfg->imageResX) {
 			radius++;
+			coordinates pixel;
+			pixel = radiusPixel(approximateCenter, rayAngle * ray, radius);
+			uint8_t val = curImg->rawBitmap[pixel.y * cfg->imageResX + pixel.x];
+			if ( val > threshold ) {
+				if (cfg->verbosity > 3) {
+					curImg->rawBitmap[pixel.y * cfg->imageResX + pixel.x] = 0;
+				}
+			} else {
+				if (cfg->verbosity > 3) {
+					curImg->rawBitmap[pixel.y * cfg->imageResX + pixel.x] = 255;
+				}
+				break;
+			}
 		}
 	}
 	return deltacoords{ 0, 0 };
@@ -66,11 +64,7 @@ deltacoords massCenter(image* frame, config* cfg){
 			}
 		}
 	}
-	coordinates centerOfMass, center;
-	centerOfMass.x = (sumX / sumTotal);
-	centerOfMass.y = (sumY / sumTotal);
-	center.x = cfg->imageResX / 2;
-	center.y = cfg->imageResY / 2;
+
 	// invert x value because of definition for moveImage function
 	move.x = -(int32_t)((sumX / sumTotal) - cfg->imageResX / 2);
 	move.y = (sumY / sumTotal) - cfg->imageResY / 2;
@@ -379,3 +373,44 @@ void calcNoiseCorners(image *imgData, config* cfg){
 	delete[] pixels;
 	return;
 }
+<<<<<<< Updated upstream
+=======
+
+/* Get the n-th pixel on a radius line. angle must be >=0 and <=360
+ *
+ * @circleCenter:  center point of the circle
+ * @direction:     angle in degrees
+ * @radius:        the n-th pixel on the line
+ *
+ * Return coordinate with x and y value of the radius pixel
+ */
+coordinates radiusPixel(coordinates circleCenter, uint16_t angle, uint32_t radius)
+{
+	double dx = 0, dy = 0, x = 0, y = 0;
+	coordinates result;
+	if ((angle >= 0 and angle <= 45) or (angle >= 315 and angle <= 360)) {
+		//iterate x up -> go right
+		dy = sin(angle);
+		result.y = circleCenter.y + round(radius * dy);
+		result.x = circleCenter.x + radius;
+	} else if (angle >= 135 and angle <= 225) {
+		//iterate x down -> go left
+		dy = sin(angle);
+		result.y = circleCenter.y + round(radius * dy);
+		result.x = circleCenter.x - radius;
+	} else if (angle > 45 and angle < 135) {
+		//iterate y up -> go up
+		dx = cos(angle);
+		result.y = circleCenter.y - radius;
+		result.x = circleCenter.x + round(radius * dx);
+	} else if (angle > 225 and angle < 315) {
+		//iterate y down -> go down
+		dx = cos(angle);
+		result.y = circleCenter.y + radius;
+		result.x = circleCenter.x + round(radius * dx);
+	} else {
+		// something is horribly wrong
+	}
+	return result;
+}
+>>>>>>> Stashed changes

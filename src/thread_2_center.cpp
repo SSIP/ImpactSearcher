@@ -68,15 +68,14 @@ void centerThread(config* cfg) {
 		}
 
 		// curImg now contains the current image ready for centering
-		// remark: hotpixel recognition was decided to be not needed because of the minimal impact it has after centering and averaging
-
 		deltacoords moveCenter;
 		coordinates approxCenter;
+
 		// rough center estimation with center of mass logic
 		moveCenter = massCenter(curImg, cfg);
 
 		approxCenter.x = (cfg->imageResX / 2) + moveCenter.x;
-		approxCenter.x = (cfg->imageResY / 2) + moveCenter.y;
+		approxCenter.y = (cfg->imageResY / 2) + moveCenter.y;
 		if (cfg->verbosity >= 3)
 		{
 			stringstream ss;
@@ -85,33 +84,13 @@ void centerThread(config* cfg) {
 			cfg->qMessages.push(ss.str());
 			cfg->mMessages.unlock();
 		}
-		calcNoiseCorners(curImg, cfg);
 
-		//refine center with ray logic
-		//moveCenter = rayCenter(approxCenter, curImg, 8, cfg);
+		calcNoiseCorners(curImg, cfg);
+		moveCenter = rayCenter(approxCenter, curImg, (uint16_t)2, cfg);
 
 		// crop image
 		moveImage(cfg, curImg, moveCenter.x, moveCenter.y);
 
-		/*firstAvgCount++;
-		if (firstAvgCount >= cfg->averageLength)
-		{
-			//calculate exact center of jupiter and ellipse parameters
-			firstAvg = true;
-		}*/
-
-		/* todo: ray centering algorithm
-		//- center of mass only until the first average image is finished
-		//- then calculate the exact center inside the average thread (see the comment there)
-		//- from this center, go to the edge in 8 rays, checking for the brightest pixel and
-		//stopping when reaching 30% brightness (use the average of 3-4 pixels)
-		//- do some magic to calculate the move vector
-		//- function prototype: raycenter(_in approx center x and y, _in imagedata, _in number of rays, _out exact center x and y, _out radius or ellipse parameters)
-		*/
-
-		// save the image for debugging
-		//if (cfg->verbosity >= 3)
-		//	debugPng(curImg->fileName, "_centered.png", curImg->rawBitmap);
 		if(firstLoop){
 			thread(averageThread, cfg).detach();
 			firstLoop = false;
