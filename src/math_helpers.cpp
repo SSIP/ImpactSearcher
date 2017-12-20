@@ -422,16 +422,8 @@ coordinates radiusPixel(coordinates circleCenter, double rad, uint32_t radius){
 		result.x = circleCenter.x + round(radius * dx / dy);
 	} else {
 		// something is horribly wrong
-		result.y = 0;
-		result.x = 0;
-		if (cfg->verbosity >= 4)
-		{
-			stringstream ss;
-			ss << "Error: angle beyond limits";
-			cfg->mMessages.lock();
-			cfg->qMessages.push(ss.str());
-			cfg->mMessages.unlock();
-		}
+		result.y = circleCenter.y;
+		result.x = circleCenter.x;
 	}
 	return result;
 }
