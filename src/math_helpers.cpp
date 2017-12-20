@@ -387,7 +387,7 @@ void calcNoiseCorners(image *imgData, config* cfg){
 	return;
 }
 
-/* Get the n-th pixel on a radius line. angle must be >=0 and <=360
+/* Get the n-th pixel on a radius line. angle must be >=0 and <= 2 * PI
  *
  * @circleCenter:  center point of the circle
  * @rad:           angle in rad
@@ -398,32 +398,40 @@ void calcNoiseCorners(image *imgData, config* cfg){
 coordinates radiusPixel(coordinates circleCenter, double rad, uint32_t radius){
 	double dx = 0, dy = 0, x = 0, y = 0;
 	coordinates result;
+	dy = sin(rad);
+	dx = cos(rad);
 	if ((rad >= 0 and rad <= 0.25 * PI) or (rad >= 1.75 * PI and rad <= 2 * PI)) {
 		//iterate x up -> go right
 		cout << "rad x up " << rad << endl;
-		dy = sin(rad);
-		result.y = circleCenter.y + round(radius * dy);
+		result.y = circleCenter.y + round(radius * dy / dx);
 		result.x = circleCenter.x + radius;
 	} else if (rad >= 0.75 * PI and rad <= 1.25 * PI) {
 		//iterate x down -> go left
 		cout << "rad x down " << rad << endl;
-		dy = sin(rad);
-		result.y = circleCenter.y + round(radius * dy);
+		result.y = circleCenter.y + round(radius * dy / dx);
 		result.x = circleCenter.x - radius;
 	} else if (rad > 0.25 * PI and rad < 0.75 * PI) {
 		//iterate y up -> go up
 		cout << "rad y up " << rad << endl;
-		dx = cos(rad);
 		result.y = circleCenter.y - radius;
-		result.x = circleCenter.x + round(radius * dx);
+		result.x = circleCenter.x + round(radius * dx / dy);
 	} else if (rad > 1.25 * PI and rad < 1.75 * PI) {
 		//iterate y down -> go down
 		cout << "rad y down " << rad << endl;
-		dx = cos(rad);
 		result.y = circleCenter.y + radius;
-		result.x = circleCenter.x + round(radius * dx);
+		result.x = circleCenter.x + round(radius * dx / dy);
 	} else {
 		// something is horribly wrong
+		result.y = 0;
+		result.x = 0;
+		if (cfg->verbosity >= 4)
+		{
+			stringstream ss;
+			ss << "Error: angle beyond limits";
+			cfg->mMessages.lock();
+			cfg->qMessages.push(ss.str());
+			cfg->mMessages.unlock();
+		}
 	}
 	return result;
 }
