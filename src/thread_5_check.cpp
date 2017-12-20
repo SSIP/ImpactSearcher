@@ -41,6 +41,12 @@ void checkThread(config* cfg) {
 			cfg->mCheck.unlock();
 		}
 
+		/* New algorithm: Define ROI as circle defined by aperture. Get brightest pixel in ROI.
+		 * Then search for additional pixels above threshold in ROI. Center ROI on all pixels
+		 * above threshold. Use same ROI for following images and count pixels above threshold
+		 * again. If more than 2 pixels in the same area in 2 follow up images are detected,
+		 * we proclaim a detection. */
+
 		// curImg now contains the current image ready for checking and reporting
 
 		int8_t foundNewROI = 1;
