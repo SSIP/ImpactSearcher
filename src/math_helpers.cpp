@@ -24,14 +24,13 @@ deltacoords rayCenter(coordinates approximateCenter, image* curImg, uint16_t num
 	double rayRad = (2 * PI) / (numberRays * 4);
 	// planets are bright. 20 sigma is considered to be the border of the planet.
 	double threshold = curImg->imgNoise.stdDev * 20 + curImg->imgNoise.average;
-	cout << "new pic" << endl;
-
 	// we need to allocate memory for storing the edge pixels
+	coordinates *circleEdge = new coordinates[numberRays * 4];
 
 	// loop through the different rays (increase the angle)
 	for (uint16_t ray = 0; ray < numberRays * 4; ray ++) {
 		uint32_t radius = 10;
-		cout << "rad " << rayRad * ray << endl;
+		bool prev = false, prev2 = false;
 		// loop through pixels in ray
 		while(radius <= cfg->imageResX) {
 			coordinates pixel;
@@ -43,16 +42,21 @@ deltacoords rayCenter(coordinates approximateCenter, image* curImg, uint16_t num
 				if (cfg->verbosity > 3) {
 					curImg->rawBitmap[pixel.y * cfg->imageResX + pixel.x] = 0;
 				}
+				prev2 = prev;
+				prev = false;
 			// we reached the border if it is darker
 			} else {
 				if (cfg->verbosity > 3) {
 					curImg->rawBitmap[pixel.y * cfg->imageResX + pixel.x] = 255;
 				}
-				// idea: have 3 pixels in a row before the edge is positivly identified.
-				// todo: add found pixel to array of pixels defining the edge
-				break;
+				if(!prev)
+					circleEdge[ray] = pixel;
+				if(prev && prev2) {
+					break;
+				}
+				prev2 = prev;
+				prev = true;
 			}
-			
 		}
 	}
 	// now we need to fit an ellipse to those coordinates.
