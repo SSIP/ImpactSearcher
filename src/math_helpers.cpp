@@ -2,7 +2,9 @@
 #include <algorithm>
 #include <sstream>
 #include <iostream>
+#include <Eigen/Dense>
 #define PI 3.14159265
+using Eigen::MatrixXd;
 
 /* Calculate the center of the planet. This requires coordinates that are already
  * within the area of the planet.
@@ -60,6 +62,7 @@ deltacoords rayCenter(coordinates approximateCenter, image* curImg, uint16_t num
 		}
 	}
 	// now we need to fit an ellipse to those coordinates.
+	// see https://stackoverflow.com/questions/37911213/how-to-fit-a-bounding-ellipse-around-a-set-of-2d-points
 	return deltacoords{ 0, 0 };
 }
 
@@ -400,28 +403,24 @@ void calcNoiseCorners(image *imgData, config* cfg){
  * Return coordinate with x and y value of the radius pixel
  */
 coordinates radiusPixel(coordinates circleCenter, double rad, uint32_t radius){
-	double dx = 0, dy = 0, x = 0, y = 0;
+	double dx = 0, dy = 0;
 	coordinates result;
 	dy = sin(rad);
 	dx = cos(rad);
 	if ((rad >= 0 and rad <= 0.25 * PI) or (rad >= 1.75 * PI and rad <= 2 * PI)) {
 		//iterate x up -> go right
-		cout << "rad x up " << rad << endl;
 		result.y = circleCenter.y + round(radius * dy / dx);
 		result.x = circleCenter.x + radius;
 	} else if (rad >= 0.75 * PI and rad <= 1.25 * PI) {
 		//iterate x down -> go left
-		cout << "rad x down " << rad << endl;
 		result.y = circleCenter.y + round(radius * dy / dx);
 		result.x = circleCenter.x - radius;
 	} else if (rad > 0.25 * PI and rad < 0.75 * PI) {
 		//iterate y up -> go up
-		cout << "rad y up " << rad << endl;
 		result.y = circleCenter.y - radius;
 		result.x = circleCenter.x + round(radius * dx / dy);
 	} else if (rad > 1.25 * PI and rad < 1.75 * PI) {
 		//iterate y down -> go down
-		cout << "rad y down " << rad << endl;
 		result.y = circleCenter.y + radius;
 		result.x = circleCenter.x + round(radius * dx / dy);
 	} else {
@@ -430,4 +429,65 @@ coordinates radiusPixel(coordinates circleCenter, double rad, uint32_t radius){
 		result.x = circleCenter.x;
 	}
 	return result;
+}
+
+/* Fit an ellipse through a given set of coordinates with least squares
+ *
+ * @numPoints:     The number of points / coordinates
+ * @pixels:        The coordinates to points
+ *
+ * Return ellipse that best fits the given coordinates
+ */
+int fitEllipse(int numPoints, coordinates *pixels) {
+	//The tolerance for error in fitting the ellipse
+	double tolerance = 1;
+	MatrixXd p(2,n); // We need a 2 x n matrix
+
+	// Fill the matrix with the coordinates
+	for(int x = 0; x < numPoints; x++) {
+		p(0,x) = pixels[x].x;
+		p(1,x) = pixels[x].y;
+	}
+	MatrixXd q = p;
+	q.conservativeResize(p.rows() + 1, p.cols());
+
+	for(size_t i = 0; i < q.cols(); i++){
+		q(q.rows() - 1, i) = 1;
+	}
+
+	double err = 2;
+	const double init_u = 1.0 / (double) n;
+	MatrixXd u = MatrixXd::Constant(n, 1, init_u);
+
+	while(err > tolerance)
+	{
+		MatrixXd Q_tr = q.transpose();
+		MatrixXd X = q * u.asDiagonal() * Q_tr;
+		MatrixXd M = (Q_tr * X.inverse() * q).diagonal();
+
+		int j_x, j_y;
+		double maximum = M.maxCoeff(&j_x, &j_y);
+		double step_size = (maximum - d - 1) / ((d + 1) * (maximum + 1));
+
+		MatrixXd new_u = (1 - step_size) * u;
+		new_u(j_x, 0) += step_size;
+
+		//Find err
+		MatrixXd u_diff = new_u - u;
+		for(size_t i = 0; i < u_diff.rows(); i++) {
+			for(size_t j = 0; j < u_diff.cols(); j++)
+				u_diff(i, j) *= u_diff(i, j); // Square each element of the matrix
+		}
+		err = sqrt(u_diff.sum());
+		u = new_u;
+	}
+
+	MatrixXd U = u.asDiagonal();
+	MatrixXd A = (1.0 / (double) d) * (p * U * p.transpose() - (p * u) * (p * u).transpose()).inverse();
+	MatrixXd c = p * u;
+
+	cout << A << endl;
+	cout << c << endl;
+
+	return 0;
 }
