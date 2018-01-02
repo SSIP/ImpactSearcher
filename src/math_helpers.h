@@ -1,54 +1,25 @@
 #include "libimse.h"
 
-typedef uint8_t** imgSlice;
-
-// defines a circle with coordinates of center plus radius
-struct circle {
-	coordinates center;
-	double_t radius;
-};
-
 struct coordPlanet {
 	double rotPoleImage; // rotation of north pole in image plane
 	double poleInclination; // inclination of north pole towards observer
 	bool westIsLeft; // if west is on the right side of image (after rotation) -> mirrored
 };
 
-deltacoords rayCenter(coordinates approximateCenter, image* frame, int16_t numberRays, config* cfg);
+deltacoords rayCenter(coordinates approximateCenter, image* frame, uint16_t numberRays, config* cfg);
 deltacoords massCenter(image* frame, config* cfg);
 
-// fit a circle to a list of coordinates with least squares
-circle fitCircle(coordinates *borderPoints);
+double getAvg(uint8_t *pixels, uint32_t size);
+double getAvg16(int16_t *pixels, uint32_t size);
 
-// returns pointers to pixels in image, thereby creating a slice through
-// the image. length of slice is returned as well.
-bool sliceImage(coordinates start, direction vector, image imageData, uint8_t **data, uint32_t length);
+double getVariance(double avg, uint8_t *pixels, uint32_t size);
+double getVariance16(double avg, int16_t *pixels, uint32_t size);
 
-// fit a simple jupiter model to image and save rotation angle and radius
-// angle = 0 means north pole is facing up
-bool fitJupiterModel(image *imageData);
-
-// walk a slice from the center in both directions until threshold is reached
-// threshold equals 2sigma of noise or something
-coordinates *findBorder(uint32_t center, imgSlice slice);
-
-// calculate avg and std dev of noise from corners of image
-// the three corners with least difference by least squares are used for
-// total background
-void calcNoiseCorners(image *imgData, config *cfg);
-
-// calculate properties of background triangles in corners
-void calcCornerSize(config *cfg);
-
-// calc noise from array of pixel values
 noise calcNoise(uint8_t *pixels, uint32_t size);
 noise calcNoise16(int16_t *pixels, uint32_t size);
 
-// parameter is subtracted image
-// calculate noise in corners of image
-// we know the area of the planet
-// find pixels with unlikely deviations from mean. take adjacent pixels
-// into account. add brightness of pixels if signal > 3sigma and return as signal
-double signalToNoise(image *subtractedData);
+void calcCornerSize(config *cfg);
 
-coordinates radiusPixel(image *imageData, coordinates circleCenter, uint16_t angle, uint32_t radius);
+void calcNoiseCorners(image *imgData, config *cfg);
+
+coordinates radiusPixel(coordinates circleCenter, double rad, uint32_t radius);

@@ -1,6 +1,10 @@
 #include "math_helpers.h"
 #include <algorithm>
 #include <sstream>
+#include <iostream>
+#include <Eigen/Dense>
+#define PI 3.14159265
+using Eigen::MatrixXd;
 
 /* Calculate the center of the planet. This requires coordinates that are already
  * within the area of the planet.
@@ -17,30 +21,47 @@
  * Return a struct that contains signed integers in which direction to move the image in order
  * to center the planet.
  */
-deltacoords rayCenter(coordinates approximateCenter, image* frame, int16_t numberRays, config* cfg){
-	int32_t i;
-	uint16_t rayAngle = 360 / numberRays;
+deltacoords rayCenter(coordinates approximateCenter, image* curImg, uint16_t numberRays, config* cfg){
+	// calculate the angle (in rad) between each ray.
+	double rayRad = (2 * PI) / (numberRays * 4);
+	// planets are bright. 20 sigma is considered to be the border of the planet.
+	double threshold = curImg->imgNoise.stdDev * 20 + curImg->imgNoise.average;
+	// we need to allocate memory for storing the edge pixels
+	coordinates *circleEdge = new coordinates[numberRays * 4];
 
-	//turn axes of coordinates i times by rayAngle
-	for (i = 1; i < numberRays; i++){
-		int32_t brightestValue, radius;
-
-		//initial value of center pixel
-		brightestValue = frame->rawBitmap[approximateCenter.x + approximateCenter.y*  cfg->imageResX];
-
-		radius = 1;
-
-		int32_t stopX(0), stopY(0);
-
-		//increase radius by one, check if pixel is brighter. if brightness < threshold, jupiter radius has been reached
-		while (stopX == 0 || stopY == 0){
-			//cross section in "x" direction
-
-			//cross section in "y" direction
-
+	// loop through the different rays (increase the angle)
+	for (uint16_t ray = 0; ray < numberRays * 4; ray ++) {
+		uint32_t radius = 10;
+		bool prev = false, prev2 = false;
+		// loop through pixels in ray
+		while(radius <= cfg->imageResX) {
+			coordinates pixel;
 			radius++;
+			pixel = radiusPixel(approximateCenter, rayRad * ray, radius);
+			uint8_t val = curImg->rawBitmap[pixel.y * cfg->imageResX + pixel.x];
+			// if pixel is above threshold, we're still within the planet
+			if ( val > threshold ) {
+				if (cfg->verbosity > 3) {
+					curImg->rawBitmap[pixel.y * cfg->imageResX + pixel.x] = 0;
+				}
+				prev2 = prev;
+				prev = false;
+			// we reached the border if it is darker
+			} else {
+				if (cfg->verbosity > 3) {
+					curImg->rawBitmap[pixel.y * cfg->imageResX + pixel.x] = 255;
+				}
+				if(!prev)
+					circleEdge[ray] = pixel;
+				if(prev && prev2) {
+					break;
+				}
+				prev2 = prev;
+				prev = true;
+			}
 		}
 	}
+	// now we need to fit an ellipse to those coordinates.
 	return deltacoords{ 0, 0 };
 }
 
@@ -66,11 +87,7 @@ deltacoords massCenter(image* frame, config* cfg){
 			}
 		}
 	}
-	coordinates centerOfMass, center;
-	centerOfMass.x = (sumX / sumTotal);
-	centerOfMass.y = (sumY / sumTotal);
-	center.x = cfg->imageResX / 2;
-	center.y = cfg->imageResY / 2;
+
 	// invert x value because of definition for moveImage function
 	move.x = -(int32_t)((sumX / sumTotal) - cfg->imageResX / 2);
 	move.y = (sumY / sumTotal) - cfg->imageResY / 2;
@@ -84,8 +101,7 @@ deltacoords massCenter(image* frame, config* cfg){
  *
  * Return the average of the values with double precission.
  */
-double getAvg(uint8_t *pixels, uint32_t size)
-{
+double getAvg(uint8_t *pixels, uint32_t size){
 	uint64_t sum = 0;
 	for(uint32_t x = 0; x < size; x++){
 		sum += pixels[x];
@@ -102,8 +118,7 @@ double getAvg(uint8_t *pixels, uint32_t size)
  *
  * Return the average of the values with double precission.
  */
-double getAvg16(int16_t *pixels, uint32_t size)
-{
+double getAvg16(int16_t *pixels, uint32_t size){
 	int64_t sum = 0;
 	for(uint32_t x = 0; x < size; x++){
 		sum += pixels[x];
@@ -119,8 +134,7 @@ double getAvg16(int16_t *pixels, uint32_t size)
  *
  * Return the average of the values with double precission.
  */
-double getVariance(double avg, uint8_t *pixels, uint32_t size)
-{
+double getVariance(double avg, uint8_t *pixels, uint32_t size){
 	// is a double_t sufficient for the numbers?
 	double_t temp = 0;
 	for(uint32_t x = 0; x < size; x++){
@@ -139,8 +153,7 @@ double getVariance(double avg, uint8_t *pixels, uint32_t size)
  *
  * Return the average of the values with double precission.
  */
-double getVariance16(double avg, int16_t *pixels, uint32_t size)
-{
+double getVariance16(double avg, int16_t *pixels, uint32_t size){
 	// is a double_t sufficient for the numbers?
 	double_t temp = 0;
 	for(uint32_t x = 0; x < size; x++){
@@ -156,7 +169,7 @@ double getVariance16(double avg, int16_t *pixels, uint32_t size)
  *
  * Return the noise struct
  */
-noise calcNoise(uint8_t *pixels, uint32_t size) {
+noise calcNoise(uint8_t *pixels, uint32_t size){
 	noise result;
 	result.average = getAvg(pixels, size);
 	result.variance = getVariance(result.average, pixels, size);
@@ -174,7 +187,7 @@ noise calcNoise(uint8_t *pixels, uint32_t size) {
  *
  * Return the noise struct
  */
-noise calcNoise16(int16_t *pixels, uint32_t size) {
+noise calcNoise16(int16_t *pixels, uint32_t size){
 	noise result;
 	result.average = getAvg16(pixels, size);
 	result.variance = getVariance16(result.average, pixels, size);
@@ -380,41 +393,104 @@ void calcNoiseCorners(image *imgData, config* cfg){
 	return;
 }
 
-/* Get the n-th pixel on a radius line. angle must be >=0 and <=360
+/* Get the n-th pixel on a radius line. angle must be >=0 and <= 2 * PI
  *
- * @image:         image data
  * @circleCenter:  center point of the circle
- * @direction:     angle in degrees
+ * @rad:           angle in rad
  * @radius:        the n-th pixel on the line
  *
  * Return coordinate with x and y value of the radius pixel
  */
-coordinates radiusPixel(image *imageData, coordinates circleCenter, uint16_t angle, uint32_t radius)
-{
-	double dx = 0, dy = 0, x = 0, y = 0;
+coordinates radiusPixel(coordinates circleCenter, double rad, uint32_t radius){
+	double dx = 0, dy = 0;
 	coordinates result;
-	if ((angle >= 0 and angle <= 45) or (angle >= 315 and angle <= 360)) {
+	dy = sin(rad);
+	dx = cos(rad);
+	if ((rad >= 0 and rad <= 0.25 * PI) or (rad >= 1.75 * PI and rad <= 2 * PI)) {
 		//iterate x up -> go right
-		dy = sin(angle);
-		result.y = circleCenter.y + round(radius * dy);
+		result.y = circleCenter.y + round(radius * dy / dx);
 		result.x = circleCenter.x + radius;
-	} else if (angle >= 135 and angle <= 225) {
+	} else if (rad >= 0.75 * PI and rad <= 1.25 * PI) {
 		//iterate x down -> go left
-		dy = sin(angle);
-		result.y = circleCenter.y + round(radius * dy);
+		result.y = circleCenter.y + round(radius * dy / dx);
 		result.x = circleCenter.x - radius;
-	} else if (angle > 45 and angle < 135) {
+	} else if (rad > 0.25 * PI and rad < 0.75 * PI) {
 		//iterate y up -> go up
-		dx = cos(angle);
 		result.y = circleCenter.y - radius;
-		result.x = circleCenter.x + round(radius * dx);
-	} else if (angle > 225 and angle < 315) {
+		result.x = circleCenter.x + round(radius * dx / dy);
+	} else if (rad > 1.25 * PI and rad < 1.75 * PI) {
 		//iterate y down -> go down
-		dx = cos(angle);
 		result.y = circleCenter.y + radius;
-		result.x = circleCenter.x + round(radius * dx);
+		result.x = circleCenter.x + round(radius * dx / dy);
 	} else {
 		// something is horribly wrong
+		result.y = circleCenter.y;
+		result.x = circleCenter.x;
 	}
 	return result;
+}
+
+/* Fit minimum volume enclosing ellipsoid around a list coordinates.
+ *
+ * This is based on https://stackoverflow.com/questions/1768197/bounding-ellipse/1768440#1768440
+ * The C++ implementation is available at https://stackoverflow.com/questions/37911213/how-to-fit-a-bounding-ellipse-around-a-set-of-2d-points
+ *
+ * @numPoints:     The number of points / coordinates
+ * @pixels:        The coordinates to points
+ *
+ * Return ellipse that best fits the given coordinates
+ */
+int fitEllipse(int numPoints, coordinates *pixels) {
+	//The tolerance for error in fitting the ellipse
+	double tolerance = 1;
+	int d = 2;
+	MatrixXd p(d,numPoints); // We need a 2 x n matrix
+
+	// Fill the matrix with the coordinates
+	for(int x = 0; x < numPoints; x++) {
+		p(0,x) = pixels[x].x;
+		p(1,x) = pixels[x].y;
+	}
+	MatrixXd q = p;
+	q.conservativeResize(p.rows() + 1, p.cols());
+
+	for(size_t i = 0; i < q.cols(); i++){
+		q(q.rows() - 1, i) = 1;
+	}
+
+	double err = 2;
+	const double init_u = 1.0 / (double) numPoints;
+	MatrixXd u = MatrixXd::Constant(numPoints, 1, init_u);
+
+	while(err > tolerance)
+	{
+		MatrixXd Q_tr = q.transpose();
+		MatrixXd X = q * u.asDiagonal() * Q_tr;
+		MatrixXd M = (Q_tr * X.inverse() * q).diagonal();
+
+		int j_x, j_y;
+		double maximum = M.maxCoeff(&j_x, &j_y);
+		double step_size = (maximum - d - 1) / ((d + 1) * (maximum + 1));
+
+		MatrixXd new_u = (1 - step_size) * u;
+		new_u(j_x, 0) += step_size;
+
+		//Find err
+		MatrixXd u_diff = new_u - u;
+		for(size_t i = 0; i < u_diff.rows(); i++) {
+			for(size_t j = 0; j < u_diff.cols(); j++)
+				u_diff(i, j) *= u_diff(i, j); // Square each element of the matrix
+		}
+		err = sqrt(u_diff.sum());
+		u = new_u;
+	}
+
+	MatrixXd U = u.asDiagonal();
+	MatrixXd A = (1.0 / (double) d) * (p * U * p.transpose() - (p * u) * (p * u).transpose()).inverse();
+	MatrixXd c = p * u;
+
+	cout << A << endl;
+	cout << c << endl;
+
+	return 0;
 }

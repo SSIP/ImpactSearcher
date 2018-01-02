@@ -1,6 +1,6 @@
 dist: trusty
 sudo: required
 before_install:
-  - sudo apt-get install -y --allow-unauthenticated libpthread-stubs0-dev cmake gcc
+  - sudo apt-get install -y --allow-unauthenticated libpthread-stubs0-dev cmake gcc libeigen3-dev
 script:
   - cmake src && make imse
