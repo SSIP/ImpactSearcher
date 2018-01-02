@@ -443,7 +443,8 @@ coordinates radiusPixel(coordinates circleCenter, double rad, uint32_t radius){
 int fitEllipse(int numPoints, coordinates *pixels) {
 	//The tolerance for error in fitting the ellipse
 	double tolerance = 1;
-	MatrixXd p(2,n); // We need a 2 x n matrix
+	int d = 2;
+	MatrixXd p(d,numPoints); // We need a 2 x n matrix
 
 	// Fill the matrix with the coordinates
 	for(int x = 0; x < numPoints; x++) {
@@ -458,8 +459,8 @@ int fitEllipse(int numPoints, coordinates *pixels) {
 	}
 
 	double err = 2;
-	const double init_u = 1.0 / (double) n;
-	MatrixXd u = MatrixXd::Constant(n, 1, init_u);
+	const double init_u = 1.0 / (double) numPoints;
+	MatrixXd u = MatrixXd::Constant(numPoints, 1, init_u);
 
 	while(err > tolerance)
 	{
