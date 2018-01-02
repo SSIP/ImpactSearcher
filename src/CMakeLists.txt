@@ -8,7 +8,7 @@ add_library(imse SHARED image_helper.cpp main.cpp thread_2_center.cpp math_helpe
 target_link_libraries (imse Eigen3::Eigen)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
-find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+find_package (Eigen3 REQUIRED NO_MODULE)
 target_compile_definitions(imse PUBLIC BUILDING_LIB _UNICODE UNICODE _CRT_SECURE_NO_WARNINGS)
 install(TARGETS imse DESTINATION lib)
 install (FILES libimse.h DESTINATION include)
