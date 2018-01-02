@@ -62,7 +62,6 @@ deltacoords rayCenter(coordinates approximateCenter, image* curImg, uint16_t num
 		}
 	}
 	// now we need to fit an ellipse to those coordinates.
-	// see https://stackoverflow.com/questions/37911213/how-to-fit-a-bounding-ellipse-around-a-set-of-2d-points
 	return deltacoords{ 0, 0 };
 }
 
@@ -431,7 +430,10 @@ coordinates radiusPixel(coordinates circleCenter, double rad, uint32_t radius){
 	return result;
 }
 
-/* Fit an ellipse through a given set of coordinates with least squares
+/* Fit minimum volume enclosing ellipsoid around a list coordinates.
+ *
+ * This is based on https://stackoverflow.com/questions/1768197/bounding-ellipse/1768440#1768440
+ * The C++ implementation is available at https://stackoverflow.com/questions/37911213/how-to-fit-a-bounding-ellipse-around-a-set-of-2d-points
  *
  * @numPoints:     The number of points / coordinates
  * @pixels:        The coordinates to points
